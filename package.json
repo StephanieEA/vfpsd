@@ -10,7 +10,9 @@
   "author": "Stephanie Andrews",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.17.1",
     "express": "^4.15.2",
+    "md5": "^2.2.1",
     "nodemon": "^1.11.0"
   }
 }
