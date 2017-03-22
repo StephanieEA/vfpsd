@@ -1,3 +1,7 @@
+const environment = process.env.NODE_ENV || 'development';
+const configuration = require('./knexfile')[environment];
+const database = require('knex')(configuration);
+
 const express = require('express')
 const bodyParser = require('body-parser')
 
@@ -11,25 +15,32 @@ app.set('port', process.env.PORT || 3000)
 
 app.locals.title = 'Fatal Police Shootings'
 
-app.locals.names = [{name: 'Tim Elliot', date: '2015-01-02', manner_of_death: 'shot',armed: 'gun',age: 53, gender: 'M',race: 'A',city: 'Shelton',state: 'WA',signs_of_mental_illness: true, threat_level: 'attack', flee: 'Not fleeing', body_camera: 'false', stateId: 'WA', cityId: 'Shelton'},
-{name: 'Sharon Elliot', date: '2015-01-02', manner_of_death: 'shot',armed: 'gun',age: 53, gender: 'M',race: 'A',city: 'Shelton',state: 'GA',signs_of_mental_illness: true, threat_level: 'attack', flee: 'Not fleeing', body_camera: 'false', stateId: 'GA', cityId: 'Shelton'}]
 app.locals.state = [{id: 'WA'}, {id: 'GA'}]
 app.locals.cities = [{id: 'Shelton', stateId: 'WA'}, {id: 'Atlanta', stateId: 'GA'}]
 
-// get all names
-app.get('/api/v1/names', (request, response) => {
-  if (!app.locals.names) { return response.sendStatus(404)  }
-  response.json(app.locals.names)
+// get all data
+app.get('/api/v1/all', (request, response) => {
+  database('fatal_police_shootings_data').select()
+    .then((fatal_police_shootings_data) => {
+      response.status(200).json(fatal_police_shootings_data)
+    })
+    .catch(function(error) {
+      response.sendStatus(500)
+      console.error('somethings wrong with db')
+  });
 })
 
-// get a specific name
-app.get('/api/v1/names/:id', (request, response) => {
-  const { id } = request.params
-  const names = app.locals.names.find(name => name.name === id)
-
-  if (!names) return response.sendStatus(404)
-
-  response.json(names)
+// get a specific incident by the persons name
+app.get('/api/v1/all/:name', (request, response) => {
+  const { name } = request.params
+  database('fatal_police_shootings_data').where('name', name)
+    .then((fatal_police_shootings_data) => {
+      response.status(200).json(fatal_police_shootings_data)
+    })
+    .catch(function(error) {
+      console.error(('no name for you!'))
+      res.sendStatus(500)
+    });
 })
 
 // get all states
