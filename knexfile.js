@@ -16,8 +16,10 @@ module.exports = {
   },
 
   test: {
-    client: 'pg',
-    connection:'postgres://localhost',
+    client: 'postgresql',
+    connection:{
+      database: 'fatal_police_shootings_data_test'
+    },
     migrations: {
       directory: './db/migrations'
     },
@@ -28,7 +30,7 @@ module.exports = {
   },
 
   production: {
-    client: 'pg',
+    client: 'postgresql',
     connection: process.env.DATABASE_URL,
     migrations: {
       directory: './db/migrations'
