@@ -12,6 +12,7 @@ exports.up = function(knex, Promise) {
             table.string('race'),
             table.string('city'),
             table.string('state'),
+            table.integer('stateId')
             table.string('signs_of_mental_illness'),
             table.string('threat_level'),
             table.string('flee'),
