@@ -1,6 +1,6 @@
-const environment = process.env.NODE_ENV || 'development';
-const configuration = require('./knexfile')[environment];
-const database = require('knex')(configuration);
+const environment = process.env.NODE_ENV || 'development'
+const configuration = require('./knexfile')[environment]
+const database = require('knex')(configuration)
 
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -25,7 +25,7 @@ app.get('/api/v1/all', (request, response) => {
     .catch(function(error) {
       response.sendStatus(500)
       console.error('somethings wrong with db')
-  });
+  })
 })
 
 // get a specific incident by it's id
@@ -42,7 +42,7 @@ app.get('/api/v1/all/:id', (request, response) => {
     .catch((error) => {
       console.error('error: ', error)
       response.sendStatus(500)
-    });
+    })
 })
 
 // get all states
@@ -54,7 +54,7 @@ app.get('/api/v1/state-territory', (request, response) => {
     .catch((error) => {
       response.sendStatus(500)
       console.error('somethings wrong with db')
-  });
+  })
 })
 
 // get a specific state by its id
@@ -63,15 +63,15 @@ app.get('/api/v1/state-territory/:id', (request, response) => {
   database('states_and_territories').where('id', id)
     .then((states_and_territories) => {
       if (states_and_territories.length == 0) {
-        response.status(404).json('double check the id')
+        response.status(404).json('no state for that id')
       } else {
         response.status(200).json(states_and_territories)
       }
     })
     .catch((error) => {
       console.error(('no state found!'))
-      res.sendStatus(500)
-    });
+      response.sendStatus(500)
+    })
 })
 
 // get all cities for a specific state - ignore till cvs is worked out
@@ -90,12 +90,12 @@ app.get('/api/v1/state-territory/:id/incidents', (request, response) => {
      if (fatal_police_shootings_data.length === 0) {
        response.status(204).json('no incidents found for the place you entered')
      }
-     response.status(200).json(fatal_police_shootings_data);
+     response.status(200).json(fatal_police_shootings_data)
    })
    .catch((error) => {
      console.error('somethings wrong with db')
      response.sendStatus(500)
-   });
+   })
 })
 
 // get average age of victims from specific states
@@ -109,18 +109,18 @@ app.get('/api/v1/state-territory/:id/average', (request, response) => {
       console.error('error: ', error)
       console.error('error: ', error)
       res.sendStatus(500)
-    });
+    })
 })
 
 // get a specific city - ignore till cvs is worked out
-// app.get('/api/v1/state/:id/cities/:id', (request, response) => {
-//   const { id } = request.params
-//   const city = app.locals.cities.find(city => city.id === id)
-//
-//   if (!city) return response.sendStatus(404)
-//
-//   response.json(city)
-// })
+app.get('/api/v1/state/:id/cities/:id', (request, response) => {
+  const { id } = request.params
+  const city = app.locals.cities.find(city => city.id === id)
+
+  if (!city) return response.sendStatus(404)
+
+  response.json(city)
+})
 
 
 // get all names for a specific city - ignore till cvs is worked out
@@ -181,23 +181,23 @@ app.post('/api/v1/state-territory', (request, response) => {
         response.sendStatus(500)
       })
 })
-
-// post a new city - don't worry about it till cvs is sorted
-// app.post('/api/v1/state/:id/cities', (request, response) => {
-//   const { id, stateId }  = request.body
 //
-//   console.log({id, stateId})
-//   if (!id || !stateId) {
-//     return response.status(422).send({
-//       error: 'No city and/or state property provided'
-//     })
-//   }
+// // post a new city - don't worry about it till cvs is sorted
+// // app.post('/api/v1/state/:id/cities', (request, response) => {
+// //   const { id, stateId }  = request.body
+// //
+// //   console.log({id, stateId})
+// //   if (!id || !stateId) {
+// //     return response.status(422).send({
+// //       error: 'No city and/or state property provided'
+// //     })
+// //   }
+// //
+// //   app.locals.cities.push({id, stateId})
+// //   console.log(app.locals.cities)
+// //   return response.status(201).json({id, stateId})
+// // })
 //
-//   app.locals.cities.push({id, stateId})
-//   console.log(app.locals.cities)
-//   return response.status(201).json({id, stateId})
-// })
-
 // update information for an incident
 app.put('/api/v1/all/:id', function(request, response) {
   const updates = request.body
