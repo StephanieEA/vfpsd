@@ -18,14 +18,21 @@ app.locals.cities = [{id: 'Shelton', stateId: 'WA'}, {id: 'Atlanta', stateId: 'G
 
 // get all data
 app.get('/api/v1/all', (request, response) => {
-  database('fatal_police_shootings_data').select()
-    .then((fatal_police_shootings_data) => {
-      response.status(200).json(fatal_police_shootings_data)
-    })
-    .catch(function(error) {
-      response.sendStatus(500)
-      console.error('somethings wrong with db')
-  })
+  const state = request.query.state;
+
+    database('fatal_police_shootings_data').select()
+      .then((fatal_police_shootings_data) => {
+        if (state) {
+          const filtered_data = fatal_police_shootings_data.filter(incident => incident.state === state)
+          response.status(200).json(filtered_data)
+        } else {
+          response.status(200).json(fatal_police_shootings_data)
+        }
+      })
+      .catch(function(error) {
+        response.sendStatus(500)
+        console.error('somethings wrong with db')
+    });
 })
 
 // get a specific incident by it's id
