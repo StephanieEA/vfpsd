@@ -29,7 +29,6 @@ describe('API Routes', function() {
         race: 'A',
         city: 'Shelton',
         state: 'WA',
-        stateId: 2,
         signs_of_mental_illness: 'true',
         threat_level: 'attack',
         flee: 'Not fleeing',
@@ -45,7 +44,6 @@ describe('API Routes', function() {
         race: 'W',
         city: 'Aloha',
         state: 'OR',
-        stateId: 43,
         signs_of_mental_illness: 'false',
         threat_level: 'attack',
         flee: 'Not fleeing',
@@ -61,7 +59,6 @@ describe('API Routes', function() {
         race: 'H',
         city: 'Wichita',
         state: 'KS',
-        stateId: 19,
         signs_of_mental_illness: 'false',
         threat_level: 'other',
         flee: 'Not fleeing',
@@ -121,7 +118,6 @@ describe('API Routes', function() {
         res.body[0].should.have.property('race');
         res.body[0].should.have.property('city');
         res.body[0].should.have.property('state');
-        res.body[0].should.have.property('stateId');
         res.body[0].should.have.property('signs_of_mental_illness');
         res.body[0].should.have.property('threat_level');
         res.body[0].should.have.property('flee');
@@ -146,7 +142,6 @@ describe('API Routes', function() {
         res.body[0].race.should.equal('A');
         res.body[0].city.should.equal('Shelton');
         res.body[0].state.should.equal('WA');
-        res.body[0].stateId.should.equal(2);
         res.body[0].signs_of_mental_illness.should.equal('true');
         res.body[0].threat_level.should.equal('attack');
         res.body[0].flee.should.equal('Not fleeing');
@@ -161,7 +156,7 @@ describe('API Routes', function() {
       .end(function (err, res) {
         res.should.have.status(404);
         res.should.be.json;
-        res.body.error.should.equal('No incidents for this state');
+        res.body.data.should.equal('There are no incidents for this state/territory- check your spelling');
         done()
       })
     })
@@ -172,7 +167,7 @@ describe('API Routes', function() {
       .end(function (err, res) {
         res.should.have.status(404);
         res.should.be.json;
-        res.body.error.should.equal('No incidents for this state');
+        res.body.data.should.equal('There are no incidents for this state/territory- check your spelling');
         done()
       })
     })
@@ -195,7 +190,6 @@ describe('API Routes', function() {
         res.body[0].should.have.property('race');
         res.body[0].should.have.property('city');
         res.body[0].should.have.property('state');
-        res.body[0].should.have.property('stateId');
         res.body[0].should.have.property('signs_of_mental_illness');
         res.body[0].should.have.property('threat_level');
         res.body[0].should.have.property('flee');
@@ -215,11 +209,12 @@ describe('API Routes', function() {
       })
     })
 
-    it.skip('should return response 500, somethings wrong with db when the request param isn\'t an integer type', function(done){
+    it('should return response 500, somethings wrong with db when the request param isn\'t an integer type', function(done){
       chai.request(app)
       .get('/api/v1/all/asdfa')
       .end(function (err, res) {
         res.should.have.status(500);
+        res.body.error.should.equal('server error')
         done()
       })
     })
@@ -280,10 +275,10 @@ describe('API Routes', function() {
   })
 
 
-  describe('GET /api/v1/state-territory/:id/incidents', function() {
+  describe('GET /api/v1/state-territory/:abbreviation/incidents', function() {
     it('should return all incidents that occured in a specific state', function(done){
     chai.request(app)
-      .get(`/api/v1/state-territory/2/incidents`)
+      .get(`/api/v1/state-territory/WA/incidents`)
       .end(function (err, res) {
         res.should.have.status(200);
         res.should.be.json;
@@ -297,7 +292,6 @@ describe('API Routes', function() {
         res.body[0].race.should.equal('A');
         res.body[0].city.should.equal('Shelton');
         res.body[0].state.should.equal('WA');
-        res.body[0].stateId.should.equal(2);
         res.body[0].signs_of_mental_illness.should.equal('true');
         res.body[0].threat_level.should.equal('attack');
         res.body[0].flee.should.equal('Not fleeing');
@@ -318,10 +312,10 @@ describe('API Routes', function() {
     })
   })
 
-  describe('GET /api/v1/state-territory/:id/average', function() {
+  describe('GET /api/v1/state-territory/:abbreviation/average', function() {
     it('should return the average age of victims from a given state/territory', function(done){
     chai.request(app)
-      .get(`/api/v1/state-territory/2/average`)
+      .get(`/api/v1/state-territory/WA/average`)
       .end(function (err, res) {
         res.should.have.status(200);
         res.should.be.json;
@@ -438,7 +432,30 @@ describe('POST /api/v1/state-territory', function() {
       done()
     })
   })
+})
 
+describe('DELETE /api/v1/state-territory/:id', function() {
+  it('should delete a specific state or territory', function(done){
+  chai.request(app)
+    .delete('/api/v1/state-territory/1')
+    .end(function (err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.message.should.equal('incident for 1 deleted')
+      done()
+    })
+  })
+
+  it('should respond with a 404 if the paramater does not exist', function(done){
+  chai.request(app)
+    .delete('/api/v1/state-territory/999')
+    .end(function (err, res) {
+      res.should.have.status(404);
+      res.should.be.json;
+      res.body.error.should.equal('id not found');
+      done()
+    })
+  })
 })
 
 

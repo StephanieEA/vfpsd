@@ -26,7 +26,7 @@ app.get('/api/v1/all', (request, response) => {
             return incident.state == state})
           if (filtered_data.length == 0) {
             response.status(404).json({
-              error: 'No incidents for this state'
+              data: 'There are no incidents for this state/territory- check your spelling'
             })
           } else {
             response.status(200).json(filtered_data)
@@ -53,8 +53,7 @@ app.get('/api/v1/all/:id', (request, response) => {
       }
     })
     .catch((error) => {
-      console.error('error: ', error)
-      response.sendStatus(500)
+      response.status(500).send({error: 'server error'})
     })
 })
 
@@ -95,9 +94,9 @@ app.get('/api/v1/state-territory/:id', (request, response) => {
 // })
 
 // get all incidents for a specific state
-app.get('/api/v1/state-territory/:id/incidents', (request, response) => {
-  const { id } = request.params
- database('fatal_police_shootings_data').where('stateId', id)
+app.get('/api/v1/state-territory/:abbreviation/incidents', (request, response) => {
+  const { abbreviation } = request.params
+ database('fatal_police_shootings_data').where('state', abbreviation)
    .then((fatal_police_shootings_data) => {
      if (fatal_police_shootings_data.length === 0) {
        response.status(404).json('no incidents found for the place you entered')
@@ -111,9 +110,9 @@ app.get('/api/v1/state-territory/:id/incidents', (request, response) => {
 })
 
 // get average age of victims from specific states
-app.get('/api/v1/state-territory/:id/average', (request, response) => {
-  const { id } = request.params
-  database('fatal_police_shootings_data').where('stateId', id).avg('age')
+app.get('/api/v1/state-territory/:abbreviation/average', (request, response) => {
+  const { abbreviation } = request.params
+  database('fatal_police_shootings_data').where('state', abbreviation).avg('age')
      .then((average) => {
        if (average[0].avg == null) {
          response.status(404).send({error: 'no incidents found'})
@@ -245,8 +244,7 @@ app.delete('/api/v1/all/:id', (request, response) => {
         response.status(200).json(`incident for id: ${id} deleted`)
       })
       .catch((error) => {
-        console.error('somethings wrong with db')
-        response.sendStatus(500)
+        response.status(500).send({error: 'server error'})
       })
 })
 
@@ -254,15 +252,27 @@ app.delete('/api/v1/all/:id', (request, response) => {
 app.delete('/api/v1/state-territory/:id', (request, response) => {
   const { id } = request.params
   database('states_and_territories').where('id', id).del()
-      .then((states_and_territories) => {
-        response.status(200).json(`incident for ${id} deleted`)
-      })
-      .catch((error) => {
-        console.error('somethings wrong with db')
-        response.sendStatus(500)
-      })
+    .then((states_and_territories) => {
+      if(states_and_territories === 0) {
+        response.status(404).send({error: 'id not found'})
+      } else {
+        response.status(200).send({message: `incident for ${id} deleted`})
+      }
+    })
+    .catch((error) => {
+      response.status(500).send({error: 'server error'})
+    })
 })
 
+
+// database('fatal_police_shootings_data').where('state', abbreviation).avg('age')
+//    .then((average) => {
+//      if (average[0].avg == null) {
+//        response.status(404).send({error: 'no incidents found'})
+//      } else {
+//        response.status(200).json(average)
+//      }
+//    })
 app.listen(app.get('port'), () => {
   console.log(`${app.locals.title} is running on ${app.get('port')}.`)
 })
