@@ -29,7 +29,7 @@ describe('API Routes', function() {
         race: 'A',
         city: 'Shelton',
         state: 'WA',
-        stateId: 56,
+        stateId: 2,
         signs_of_mental_illness: 'true',
         threat_level: 'attack',
         flee: 'Not fleeing',
@@ -105,7 +105,7 @@ describe('API Routes', function() {
   });
 
   describe('GET /api/v1/all', function() {
-    it('should return all incident data', function(done){
+    it('should return all incident data for a request without any queries', function(done){
     chai.request(app)
       .get('/api/v1/all')
       .end(function (err, res) {
@@ -126,6 +126,54 @@ describe('API Routes', function() {
         res.body[0].should.have.property('threat_level');
         res.body[0].should.have.property('flee');
         res.body[0].should.have.property('body_camera');
+        done()
+      })
+    })
+
+    it('should return the appropriate data for a query by state that exists', function(done){
+    chai.request(app)
+      .get('/api/v1/all?state=WA')
+      .end(function (err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('array');
+        res.body.length.should.equal(1);
+        res.body[0].name.should.equal('Tim Elliot');
+        res.body[0].date.should.equal('2015-01-02');
+        res.body[0].manner_of_death.should.equal('shot');
+        res.body[0].age.should.equal(53);
+        res.body[0].gender.should.equal('M');
+        res.body[0].race.should.equal('A');
+        res.body[0].city.should.equal('Shelton');
+        res.body[0].state.should.equal('WA');
+        res.body[0].stateId.should.equal(2);
+        res.body[0].signs_of_mental_illness.should.equal('true');
+        res.body[0].threat_level.should.equal('attack');
+        res.body[0].flee.should.equal('Not fleeing');
+        res.body[0].body_camera.should.equal('false');
+        done()
+      })
+    })
+
+    it('should return the appropriate data for a query by state when none exists', function(done){
+    chai.request(app)
+      .get('/api/v1/all?state=GA')
+      .end(function (err, res) {
+        res.should.have.status(404);
+        res.should.be.json;
+        res.body.error.should.equal('No incidents for this state');
+
+        done()
+      })
+    })
+
+    it('should respond appropriately when the query by state is innacurate', function(done){
+    chai.request(app)
+      .get('/api/v1/all?state=GAA')
+      .end(function (err, res) {
+        res.should.have.status(404);
+        res.should.be.json;
+        res.body.error.should.equal('No incidents for this state');
         done()
       })
     })
@@ -156,9 +204,7 @@ describe('API Routes', function() {
         done()
       })
     })
-  })
 
-  describe('GET /api/v1/all/:id', function() {
     it('should return not found for a nonexisting id', function(done){
     chai.request(app)
       .get('/api/v1/all/89999')
@@ -169,11 +215,9 @@ describe('API Routes', function() {
         done()
       })
     })
-  })
 
-  describe('GET /api/v1/all/:id', function() {
     it.skip('should return response 500, somethings wrong with db when the request param isn\'t an integer type', function(done){
-    chai.request(app)
+      chai.request(app)
       .get('/api/v1/all/asdfa')
       .end(function (err, res) {
         res.should.have.status(500);
@@ -200,9 +244,24 @@ describe('API Routes', function() {
   })
 
   describe('GET /api/v1/state-territory/:id', function() {
+    it('should return a specific states or territory', function(done){
+    chai.request(app)
+      .get('/api/v1/state-territory/1')
+      .end(function (err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('array');
+        res.body.length.should.equal(1);
+        res.body[0].name.should.equal('Kansas');
+        res.body[0].id.should.equal(1);
+        res.body[0].abbreviation.should.equal('KS');
+        done()
+      })
+    })
+
     it('should return not found for a nonexisting id', function(done){
     chai.request(app)
-      .get('/api/v1/state-territory/89999')
+      .get('/api/v1/state-territory/8999')
       .end(function (err, res) {
         res.should.have.status(404);
         res.should.be.json;
@@ -210,9 +269,7 @@ describe('API Routes', function() {
         done()
       })
     })
-  })
 
-  describe('GET /api/v1/state-territory/:id', function() {
     it('should return response 500, somethings wrong with db when the request param isn\'t an integer type', function(done){
     chai.request(app)
       .get('/api/v1/state-territory/asdfa')
@@ -223,77 +280,109 @@ describe('API Routes', function() {
     })
   })
 
-//   describe('GET /api/v1/folders/:id/urls', function() {
-//     it('should return all urls belonging to a specific folder', function(done){
-//     chai.request(app)
-//       .get(`/api/v1/folders/${1}/urls`)
-//       .end(function (err, res) {
-//         res.should.have.status(200);
-//         res.should.be.json;
-//         res.body.should.be.a('array');
-//         res.body.length.should.equal(1);
-//         res.body[0].should.have.property('visits');
-//         res.body[0].should.have.property('id');
-//         res.body[0].should.have.property('long_url');
-//         res.body[0].should.have.property('created_at');
-//         res.body[0].should.have.property('updated_at');
-//         done()
-//       })
-//     })
-//   })
-//
-//   describe('POST /api/v1/folders', function() {
-//     it('should return all folders with the added folder', function(done){
-//     chai.request(app)
-//       .post(`/api/v1/folders/`)
-//       .send({ name: 'Aliens',
-//       })
-//       .end(function (err, res) {
-//         res.should.have.status(200);
-//         res.should.be.json;
-//         res.body.should.be.a('array');
-//         res.body.length.should.equal(3);
-//         res.body[2].should.have.property('name');
-//         res.body[2].should.have.property('id');
-//         res.body[2].should.have.property('name', 'Aliens');
-//         res.body[2].should.have.property('created_at');
-//         res.body[2].should.have.property('updated_at');
-//         done()
-//       })
-//     })
-//   })
-//
-//   describe('POST /api/v1/folders/:id/urls', function() {
-//     it('should return all urls belonging to the specifed folder, including the added url', function(done){
-//     chai.request(app)
-//       .post(`/api/v1/folders/${1}/urls`)
-//       .send({ long_url: 'www.turing.io' })
-//       .end(function (err, res) {
-//         res.should.have.status(200);
-//         res.should.be.json;
-//         res.body.should.be.a('array');
-//         res.body.length.should.equal(2);
-//         res.body[0].should.have.property('visits');
-//         res.body[0].should.have.property('id');
-//         res.body[0].should.have.property('long_url');
-//         res.body[0].should.have.property('created_at');
-//         res.body[0].should.have.property('updated_at');
-//         done()
-//       })
-//     })
-//   })
-//
-  // describe('GET /:id', function() {
-  //   it('should redirect to the long_url associated with that id', function(done){
-  //   chai.request(app)
-  //     .get(`/2`)
-  //     .end(function (err, res) {
-  //       res.should.have.status(200);
-  //       expect(res).to.redirect;
-  //       expect(res).to.redirectTo('http://www.animals.com/')
-  //       res.should.be.html;
-  //       done()
-  //     })
-  //   })
-  // })
+
+  describe('GET /api/v1/state-territory/:id/incidents', function() {
+    it('should return all incidents that occured in a specific state', function(done){
+    chai.request(app)
+      .get(`/api/v1/state-territory/2/incidents`)
+      .end(function (err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('array');
+        res.body.length.should.equal(1);
+        res.body[0].name.should.equal('Tim Elliot');
+        res.body[0].date.should.equal('2015-01-02');
+        res.body[0].manner_of_death.should.equal('shot');
+        res.body[0].age.should.equal(53);
+        res.body[0].gender.should.equal('M');
+        res.body[0].race.should.equal('A');
+        res.body[0].city.should.equal('Shelton');
+        res.body[0].state.should.equal('WA');
+        res.body[0].stateId.should.equal(2);
+        res.body[0].signs_of_mental_illness.should.equal('true');
+        res.body[0].threat_level.should.equal('attack');
+        res.body[0].flee.should.equal('Not fleeing');
+        res.body[0].body_camera.should.equal('false');
+        done()
+      })
+    })
+
+    it.skip('should return not found if there are no incidents for the state', function(done){
+    chai.request(app)
+      .get('/api/v1/state-territory/1/incidents')
+      .end(function (err, res) {
+        res.should.have.status(404);
+        res.should.be.json;
+        res.body.should.equal('no incidents found for the place you entered');
+        done()
+      })
+    })
+  })
+
+  describe('POST /api/v1/all', function() {
+    it('should return all incidents with the added incident for a properly formatted request', function(done){
+    chai.request(app)
+      .post(`/api/v1/all`)
+      .send({
+        name: 'Matthew Hoffman',
+        date: '2015-01-04',
+        manner_of_death: 'shot',
+        armed: 'toy weapon',
+        age: 32,
+        gender: 'M',
+        race: 'W',
+        city: 'San Francisco',
+        state: 'CA',
+        stateId: 4,
+        signs_of_mental_illness: 'true',
+        threat_level: 'attack',
+        flee: 'Not fleeing',
+        body_camera: 'false'
+      })
+      .end(function (err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('array');
+        res.body.length.should.equal(4);
+        res.body[3].name.should.equal('Matthew Hoffman');
+        res.body[3].date.should.equal('2015-01-04');
+        res.body[3].manner_of_death.should.equal('shot');
+        res.body[3].armed.should.equal('toy weapon');
+        res.body[3].age.should.equal(32);
+        res.body[3].gender.should.equal('M');
+        res.body[3].race.should.equal('W');
+        res.body[3].city.should.equal('San Francisco');
+        res.body[3].state.should.equal('CA');
+      //  res.body[3].stateId.should.equal(4);
+        res.body[3].signs_of_mental_illness.should.equal('true');
+        res.body[3].threat_level.should.equal('attack');
+        res.body[3].flee.should.equal('Not fleeing');
+        res.body[3].body_camera.should.equal('false');
+        done()
+      })
+    })
+  })
+
+describe('POST /api/v1/state-territory', function() {
+  it('should return all states belonging to the specifed folder, including the added state', function(done){
+  chai.request(app)
+    .post(`/api/v1/state-territory`)
+    .send({name: 'Florida', abbreviation: 'FL'})
+    .end(function (err, res) {
+      console.log(res.body)
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('array');
+      res.body[3].should.have.property('id');
+      res.body[3].should.have.property('name');
+      res.body[3].should.have.property('abbreviation');
+      res.body[3].id.should.equal(4);
+      res.body[3].name.should.equal('Florida');
+      res.body[3].abbreviation.should.equal('FL');
+      done()
+    })
+  })
+})
+
+
 });

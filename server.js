@@ -14,7 +14,6 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.set('port', process.env.PORT || 3000)
 
 app.locals.title = 'Fatal Police Shootings'
-app.locals.cities = [{id: 'Shelton', stateId: 'WA'}, {id: 'Atlanta', stateId: 'GA'}]
 
 // get all data
 app.get('/api/v1/all', (request, response) => {
@@ -23,9 +22,16 @@ app.get('/api/v1/all', (request, response) => {
     database('fatal_police_shootings_data').select()
       .then((fatal_police_shootings_data) => {
         if (state) {
-          const filtered_data = fatal_police_shootings_data.filter(incident => incident.state === state)
-          response.status(200).json(filtered_data)
-        } else {
+          const filtered_data = fatal_police_shootings_data.filter((incident) => {
+            return incident.state == state})
+          if (filtered_data.length == 0) {
+            response.status(404).json({
+              error: 'No incidents for this state'
+            })
+          } else {
+            response.status(200).json(filtered_data)
+          }
+        } else  {
           response.status(200).json(fatal_police_shootings_data)
         }
       })
@@ -76,7 +82,6 @@ app.get('/api/v1/state-territory/:id', (request, response) => {
       }
     })
     .catch((error) => {
-      console.error(('no state found!'))
       response.sendStatus(500)
     })
 })
@@ -95,7 +100,7 @@ app.get('/api/v1/state-territory/:id/incidents', (request, response) => {
  database('fatal_police_shootings_data').where('stateId', id)
    .then((fatal_police_shootings_data) => {
      if (fatal_police_shootings_data.length === 0) {
-       response.status(204).json('no incidents found for the place you entered')
+       response.status(404).json('no incidents found for the place you entered')
      }
      response.status(200).json(fatal_police_shootings_data)
    })
@@ -120,15 +125,14 @@ app.get('/api/v1/state-territory/:id/average', (request, response) => {
 })
 
 // get a specific city - ignore till cvs is worked out
-app.get('/api/v1/state/:id/cities/:id', (request, response) => {
-  const { id } = request.params
-  const city = app.locals.cities.find(city => city.id === id)
-
-  if (!city) return response.sendStatus(404)
-
-  response.json(city)
-})
-
+// app.get('/api/v1/state/:id/cities/:id', (request, response) => {
+//   const { id } = request.params
+//   const city = app.locals.cities.find(city => city.id === id)
+//
+//   if (!city) return response.sendStatus(404)
+//
+//   response.json(city)
+// })
 
 // get all names for a specific city - ignore till cvs is worked out
 // app.get('/api/v1/state/:id/cities/:id/names', (request, response) => {
@@ -144,25 +148,23 @@ app.post('/api/v1/all', (request, response) => {
 
   const { name, date, manner_of_death, armed, age, gender, race, city, state, signs_of_mental_illness, threat_level, flee, body_camera } = request.body
 
-  if ( !body_camera || !name || !date || !manner_of_death || !armed || !age || !gender || !race || !city || !state || !signs_of_mental_illness || !threat_level || !flee || !body_camera)
-    {
-    response.sendStatus(422)
-    console.error('All properties are not provided')
+  if ( !body_camera || !name || !date || !manner_of_death || !armed || !age || !gender || !race || !city || !state || !signs_of_mental_illness || !threat_level || !flee || !body_camera) {
+    response.sendStatus(422).json('All properties are not provided')
+  } else {
+    const incident = { name, date, manner_of_death, armed, age, gender, race, city, state, signs_of_mental_illness, threat_level, flee, body_camera }
+
+    database('fatal_police_shootings_data').insert(incident)
+      .then(() => {
+        database('fatal_police_shootings_data').select()
+        .then((fatal_police_shootings_data) => {
+          response.status(200).json(fatal_police_shootings_data)
+        })
+        .catch((error) => {
+          console.error('somethings wrong with db')
+          response.sendStatus(500)
+        })
+      })
   }
-
-  const incident = { name, date, manner_of_death, armed, age, gender, race, city, state, signs_of_mental_illness, threat_level, flee, body_camera }
-
-  database('fatal_police_shootings_data').insert(incident)
-    .then(() => {
-      database('fatal_police_shootings_data').select()
-    })
-      .then((fatal_police_shootings_data) => {
-        response.status(200).json(fatal_police_shootings_data)
-      })
-      .catch((error) => {
-        console.error('somethings wrong with db')
-        response.sendStatus(500)
-      })
 })
 
 // post a new state
@@ -179,7 +181,6 @@ app.post('/api/v1/state-territory', (request, response) => {
   database('states_and_territories').insert(state)
     .then(() => {
       database('states_and_territories').select()
-    })
       .then((states_and_territories) => {
         response.status(200).json(states_and_territories)
       })
@@ -187,6 +188,7 @@ app.post('/api/v1/state-territory', (request, response) => {
         console.error('somethings wrong with db')
         response.sendStatus(500)
       })
+    })
 })
 //
 // // post a new city - don't worry about it till cvs is sorted
