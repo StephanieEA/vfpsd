@@ -162,7 +162,6 @@ describe('API Routes', function() {
         res.should.have.status(404);
         res.should.be.json;
         res.body.error.should.equal('No incidents for this state');
-
         done()
       })
     })
@@ -307,13 +306,38 @@ describe('API Routes', function() {
       })
     })
 
-    it.skip('should return not found if there are no incidents for the state', function(done){
+    it('should return not found if there are no incidents for the state', function(done){
     chai.request(app)
       .get('/api/v1/state-territory/1/incidents')
       .end(function (err, res) {
         res.should.have.status(404);
         res.should.be.json;
         res.body.should.equal('no incidents found for the place you entered');
+        done()
+      })
+    })
+  })
+
+  describe('GET /api/v1/state-territory/:id/average', function() {
+    it('should return the average age of victims from a given state/territory', function(done){
+    chai.request(app)
+      .get(`/api/v1/state-territory/2/average`)
+      .end(function (err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('array');
+        res.body.length.should.equal(1);
+        res.body[0].avg.should.equal('53.0000000000000000')
+        done()
+      })
+    })
+
+    it('should return the appropriate status and error message when there are no victims from that state', function(done){
+    chai.request(app)
+      .get(`/api/v1/state-territory/92/average`)
+      .end(function (err, res) {
+        res.should.have.status(404);
+        res.body.error.should.equal('no incidents found')
         done()
       })
     })
@@ -369,7 +393,6 @@ describe('POST /api/v1/state-territory', function() {
     .post(`/api/v1/state-territory`)
     .send({name: 'Florida', abbreviation: 'FL'})
     .end(function (err, res) {
-      console.log(res.body)
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('array');
@@ -382,6 +405,40 @@ describe('POST /api/v1/state-territory', function() {
       done()
     })
   })
+
+  it('should return a status 400 and error message of all properties are not provided if the request does not include an abbreviation', function(done){
+  chai.request(app)
+    .post(`/api/v1/state-territory`)
+    .send({name: 'Florida'})
+    .end(function (err, res) {
+      res.should.have.status(400)
+      res.body.error.should.equal('All properties are not provided')
+      done()
+    })
+  })
+
+  it('should return a status 400 and error message of all properties are not provided if the request does not include an name', function(done){
+  chai.request(app)
+    .post(`/api/v1/state-territory`)
+    .send({abbreviation: 'FL'})
+    .end(function (err, res) {
+      res.should.have.status(400)
+      res.body.error.should.equal('All properties are not provided')
+      done()
+    })
+  })
+
+  it('should return a status 400 and error message of incorrect format if the request body includes values other than name and abbreviation', function(done){
+  chai.request(app)
+    .post(`/api/v1/state-territory`)
+    .send({name: 'Alaska', abbreviation: 'AK', moose: 'for dayzz'})
+    .end(function (err, res) {
+      res.should.have.status(400)
+      res.body.error.should.equal('incorrect format')
+      done()
+    })
+  })
+
 })
 
 

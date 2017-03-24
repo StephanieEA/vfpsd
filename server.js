@@ -101,11 +101,11 @@ app.get('/api/v1/state-territory/:id/incidents', (request, response) => {
    .then((fatal_police_shootings_data) => {
      if (fatal_police_shootings_data.length === 0) {
        response.status(404).json('no incidents found for the place you entered')
-     }
+     } else {
      response.status(200).json(fatal_police_shootings_data)
+     }
    })
    .catch((error) => {
-     console.error('somethings wrong with db')
      response.sendStatus(500)
    })
 })
@@ -114,13 +114,15 @@ app.get('/api/v1/state-territory/:id/incidents', (request, response) => {
 app.get('/api/v1/state-territory/:id/average', (request, response) => {
   const { id } = request.params
   database('fatal_police_shootings_data').where('stateId', id).avg('age')
-     .then((fatal_police_shootings_data) => {
-       response.status(200).json(fatal_police_shootings_data)
+     .then((average) => {
+       if (average[0].avg == null) {
+         response.status(404).send({error: 'no incidents found'})
+       } else {
+         response.status(200).json(average)
+       }
      })
     .catch((error) => {
-      console.error('error: ', error)
-      console.error('error: ', error)
-      res.sendStatus(500)
+      response.sendStatus(500)
     })
 })
 
@@ -149,7 +151,8 @@ app.post('/api/v1/all', (request, response) => {
   const { name, date, manner_of_death, armed, age, gender, race, city, state, signs_of_mental_illness, threat_level, flee, body_camera } = request.body
 
   if ( !body_camera || !name || !date || !manner_of_death || !armed || !age || !gender || !race || !city || !state || !signs_of_mental_illness || !threat_level || !flee || !body_camera) {
-    response.sendStatus(422).json('All properties are not provided')
+    response.status(400).send({error: 'All properties are not provided'})
+
   } else {
     const incident = { name, date, manner_of_death, armed, age, gender, race, city, state, signs_of_mental_illness, threat_level, flee, body_camera }
 
@@ -169,26 +172,27 @@ app.post('/api/v1/all', (request, response) => {
 
 // post a new state
 app.post('/api/v1/state-territory', (request, response) => {
-  const { name, abbreviation } = request.body
-  if (!name || !abbreviation)
-    {
-    response.sendStatus(422)
-    console.error('All properties are not provided')
+  if (Object.keys(request.body).length > 2) {
+    response.status(400).send({error: 'incorrect format'})
+  } else {
+    const { name, abbreviation } = request.body
+    if (!name || !abbreviation) {
+     response.status(400).send({error: 'All properties are not provided'})
+    } else {
+      const state = { name, abbreviation }
+
+      database('states_and_territories').insert(state)
+        .then(() => {
+          database('states_and_territories').select()
+          .then((states_and_territories) => {
+            response.status(200).json(states_and_territories)
+          })
+          .catch((error) => {
+            response.status(500).send({error: 'something\'s wrong with db'})
+          })
+        })
+    }
   }
-
-  const state = { name, abbreviation }
-
-  database('states_and_territories').insert(state)
-    .then(() => {
-      database('states_and_territories').select()
-      .then((states_and_territories) => {
-        response.status(200).json(states_and_territories)
-      })
-      .catch((error) => {
-        console.error('somethings wrong with db')
-        response.sendStatus(500)
-      })
-    })
 })
 //
 // // post a new city - don't worry about it till cvs is sorted
