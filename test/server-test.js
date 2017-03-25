@@ -400,23 +400,23 @@ describe('POST /api/v1/state-territory', function() {
     })
   })
 
-  it('should return a status 400 and error message of all properties are not provided if the request does not include an abbreviation', function(done){
+  it('should return a status 422 and error message of all properties are not provided if the request does not include an abbreviation', function(done){
   chai.request(app)
     .post(`/api/v1/state-territory`)
     .send({name: 'Florida'})
     .end(function (err, res) {
-      res.should.have.status(400)
+      res.should.have.status(422)
       res.body.error.should.equal('All properties are not provided')
       done()
     })
   })
 
-  it('should return a status 400 and error message of all properties are not provided if the request does not include an name', function(done){
+  it('should return a status 422 and error message of all properties are not provided if the request does not include an name', function(done){
   chai.request(app)
     .post(`/api/v1/state-territory`)
     .send({abbreviation: 'FL'})
     .end(function (err, res) {
-      res.should.have.status(400)
+      res.should.have.status(422)
       res.body.error.should.equal('All properties are not provided')
       done()
     })
@@ -427,8 +427,32 @@ describe('POST /api/v1/state-territory', function() {
     .post(`/api/v1/state-territory`)
     .send({name: 'Alaska', abbreviation: 'AK', moose: 'for dayzz'})
     .end(function (err, res) {
-      res.should.have.status(400)
+      res.should.have.status(422)
       res.body.error.should.equal('incorrect format')
+      done()
+    })
+  })
+})
+
+describe('DELETE /api/v1/all/:id', function() {
+  it('should delete a specific incident', function(done){
+  chai.request(app)
+    .delete('/api/v1/all/1')
+    .end(function (err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.message.should.equal('incident for id 1 deleted')
+      done()
+    })
+  })
+
+  it('should respond with a 404, message of id not found, if the state does not exist', function(done){
+  chai.request(app)
+    .delete('/api/v1/all/999')
+    .end(function (err, res) {
+      res.should.have.status(404);
+      res.should.be.json;
+      res.body.error.should.equal('id not found');
       done()
     })
   })
@@ -441,12 +465,12 @@ describe('DELETE /api/v1/state-territory/:id', function() {
     .end(function (err, res) {
       res.should.have.status(200);
       res.should.be.json;
-      res.body.message.should.equal('incident for 1 deleted')
+      res.body.message.should.equal('incident for id 1 deleted')
       done()
     })
   })
 
-  it('should respond with a 404 if the paramater does not exist', function(done){
+  it('should respond with a 404, message of id not found, if the state does not exist', function(done){
   chai.request(app)
     .delete('/api/v1/state-territory/999')
     .end(function (err, res) {
@@ -457,6 +481,5 @@ describe('DELETE /api/v1/state-territory/:id', function() {
     })
   })
 })
-
 
 });

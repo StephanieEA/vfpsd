@@ -172,11 +172,11 @@ app.post('/api/v1/all', (request, response) => {
 // post a new state
 app.post('/api/v1/state-territory', (request, response) => {
   if (Object.keys(request.body).length > 2) {
-    response.status(400).send({error: 'incorrect format'})
+    response.status(422).send({error: 'incorrect format'})
   } else {
     const { name, abbreviation } = request.body
     if (!name || !abbreviation) {
-     response.status(400).send({error: 'All properties are not provided'})
+     response.status(422).send({error: 'All properties are not provided'})
     } else {
       const state = { name, abbreviation }
 
@@ -241,7 +241,11 @@ app.delete('/api/v1/all/:id', (request, response) => {
   const { id } = request.params
   database('fatal_police_shootings_data').where('id', id).del()
       .then((fatal_police_shootings_data) => {
-        response.status(200).json(`incident for id: ${id} deleted`)
+        if(fatal_police_shootings_data === 0){
+          response.status(404).send({error: 'id not found'})
+        } else {
+          response.status(200).json({message: `incident for id ${id} deleted`})
+        }
       })
       .catch((error) => {
         response.status(500).send({error: 'server error'})
@@ -256,7 +260,7 @@ app.delete('/api/v1/state-territory/:id', (request, response) => {
       if(states_and_territories === 0) {
         response.status(404).send({error: 'id not found'})
       } else {
-        response.status(200).send({message: `incident for ${id} deleted`})
+        response.status(200).send({message: `incident for id ${id} deleted`})
       }
     })
     .catch((error) => {
@@ -264,15 +268,6 @@ app.delete('/api/v1/state-territory/:id', (request, response) => {
     })
 })
 
-
-// database('fatal_police_shootings_data').where('state', abbreviation).avg('age')
-//    .then((average) => {
-//      if (average[0].avg == null) {
-//        response.status(404).send({error: 'no incidents found'})
-//      } else {
-//        response.status(200).json(average)
-//      }
-//    })
 app.listen(app.get('port'), () => {
   console.log(`${app.locals.title} is running on ${app.get('port')}.`)
 })
