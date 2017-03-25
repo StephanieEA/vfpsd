@@ -85,14 +85,6 @@ app.get('/api/v1/state-territory/:id', (request, response) => {
     })
 })
 
-// get all cities for a specific state - ignore till cvs is worked out
-// app.get('/api/v1/state/:id/cities', (request, response) => {
-//   const { id } = request.params
-//   const cities = app.locals.cities.filter(city => city.stateId === id)
-//   if (!cities) return response.sendStatus(404)
-//   response.json(cities)
-// })
-
 // get all incidents for a specific state
 app.get('/api/v1/state-territory/:abbreviation/incidents', (request, response) => {
   const { abbreviation } = request.params
@@ -125,37 +117,19 @@ app.get('/api/v1/state-territory/:abbreviation/average', (request, response) => 
     })
 })
 
-// get a specific city - ignore till cvs is worked out
-// app.get('/api/v1/state/:id/cities/:id', (request, response) => {
-//   const { id } = request.params
-//   const city = app.locals.cities.find(city => city.id === id)
-//
-//   if (!city) return response.sendStatus(404)
-//
-//   response.json(city)
-// })
-
-// get all names for a specific city - ignore till cvs is worked out
-// app.get('/api/v1/state/:id/cities/:id/names', (request, response) => {
-//   const { id } = request.params
-//   // the request params only gives me {id: 'city name'}, how do I prevent it from getting a city from another state
-//   const names = app.locals.names.filter(name => name.cityId === id)
-//   if (!names) return response.sendStatus(404)
-//   response.json(names)
-// })
-
 // post a new incident
 app.post('/api/v1/all', (request, response) => {
-
-  const { name, date, manner_of_death, armed, age, gender, race, city, state, signs_of_mental_illness, threat_level, flee, body_camera } = request.body
-
-  if ( !body_camera || !name || !date || !manner_of_death || !armed || !age || !gender || !race || !city || !state || !signs_of_mental_illness || !threat_level || !flee || !body_camera) {
-    response.status(400).send({error: 'All properties are not provided'})
-
+  if (Object.keys(request.body).length > 14) {
+    response.status(422).send({error: 'incorrect format'})
   } else {
-    const incident = { name, date, manner_of_death, armed, age, gender, race, city, state, signs_of_mental_illness, threat_level, flee, body_camera }
+    const { name, date, manner_of_death, armed, age, gender, race, city, state, signs_of_mental_illness, threat_level, flee, body_camera } = request.body
 
-    database('fatal_police_shootings_data').insert(incident)
+    if ( !body_camera || !name || !date || !manner_of_death || !armed || !age || !gender || !race || !city || !state || !signs_of_mental_illness || !threat_level || !flee || !body_camera) {
+      response.status(422).send({error: 'All properties are not provided'})
+    } else {
+      const incident = { name, date, manner_of_death, armed, age, gender, race, city, state, signs_of_mental_illness, threat_level, flee, body_camera }
+
+      database('fatal_police_shootings_data').insert(incident)
       .then(() => {
         database('fatal_police_shootings_data').select()
         .then((fatal_police_shootings_data) => {
@@ -166,6 +140,7 @@ app.post('/api/v1/all', (request, response) => {
           response.sendStatus(500)
         })
       })
+    }
   }
 })
 
@@ -193,47 +168,39 @@ app.post('/api/v1/state-territory', (request, response) => {
     }
   }
 })
-//
-// // post a new city - don't worry about it till cvs is sorted
-// // app.post('/api/v1/state/:id/cities', (request, response) => {
-// //   const { id, stateId }  = request.body
-// //
-// //   console.log({id, stateId})
-// //   if (!id || !stateId) {
-// //     return response.status(422).send({
-// //       error: 'No city and/or state property provided'
-// //     })
-// //   }
-// //
-// //   app.locals.cities.push({id, stateId})
-// //   console.log(app.locals.cities)
-// //   return response.status(201).json({id, stateId})
-// // })
-//
+
 // update information for an incident
-app.put('/api/v1/all/:id', function(request, response) {
+app.patch('/api/v1/all/:id', (request, response) => {
   const updates = request.body
   const { id } = request.params
-  database('fatal_police_shootings_data').where('id', id).update(updates)
+  database('fatal_police_shootings_data').where('id', id).select().update(updates)
     .then(() => {
-      database('fatal_police_shootings_data').where('id', id)
-    })
+      database('fatal_police_shootings_data').where('id', id).select()
       .then((fatal_police_shootings_data) => {
-        response.sendStatus(200).json(fatal_police_shootings_data)
+        if (fatal_police_shootings_data.length == 0) {
+          response.status(404).send({error: 'no incidents for this id'})
+        } else {
+          response.status(200).send(fatal_police_shootings_data)
+        }
       })
+    })
 })
 
 // update information for a state
-app.put('/api/v1/state-territory/:id', (request, response) => {
+app.patch('/api/v1/state-territory/:id', (request, response) => {
   const updates = request.body
   const { id } = request.params
-  database('states_and_territories').where('id', id).update(updates)
+  database('states_and_territories').where('id', id).select().update(updates)
     .then(() => {
-      database('states_and_territories').where('id', id)
-    })
+      database('states_and_territories').where('id', id).select()
       .then((states_and_territories) => {
-        response.sendStatus(200).json(states_and_territories)
+        if (states_and_territories.length == 0){
+          response.status(404).send({error: 'no states or territories for this id'})
+        } else {
+          response.status(200).send(states_and_territories)
+        }
       })
+    })
 })
 
 // delete an incident

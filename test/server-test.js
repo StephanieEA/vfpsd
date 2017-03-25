@@ -126,7 +126,7 @@ describe('API Routes', function() {
       })
     })
 
-    it('should return the appropriate data for a query by state that exists', function(done){
+    it('should return status 200 and the appropriate data for a query by state that exists', function(done){
     chai.request(app)
       .get('/api/v1/all?state=WA')
       .end(function (err, res) {
@@ -150,7 +150,7 @@ describe('API Routes', function() {
       })
     })
 
-    it('should return the appropriate data for a query by state when none exists', function(done){
+    it('should return a status 404 and the appropriate message for a query by state when none exists', function(done){
     chai.request(app)
       .get('/api/v1/all?state=GA')
       .end(function (err, res) {
@@ -161,7 +161,7 @@ describe('API Routes', function() {
       })
     })
 
-    it('should respond appropriately when the query by state is innacurate', function(done){
+    it('should return a status 404 and the appropriate message when the query by state is innacurate', function(done){
     chai.request(app)
       .get('/api/v1/all?state=GAA')
       .end(function (err, res) {
@@ -174,7 +174,7 @@ describe('API Routes', function() {
   })
 
   describe('GET /api/v1/all/:id', function() {
-    it('should return a specific incident for a correct id', function(done){
+    it('should return a 200 response and the specific incident for a correct id', function(done){
     chai.request(app)
       .get('/api/v1/all/1')
       .end(function (err, res) {
@@ -198,7 +198,7 @@ describe('API Routes', function() {
       })
     })
 
-    it('should return not found for a nonexisting id', function(done){
+    it('should return a response 404 and the appropriate message for a nonexisting id', function(done){
     chai.request(app)
       .get('/api/v1/all/89999')
       .end(function (err, res) {
@@ -221,7 +221,7 @@ describe('API Routes', function() {
   })
 
   describe('GET /api/v1/state-territory', function() {
-    it('should return all states and territories', function(done){
+    it('should return a response 200 and all states and territories', function(done){
     chai.request(app)
       .get('/api/v1/state-territory')
       .end(function (err, res) {
@@ -238,7 +238,7 @@ describe('API Routes', function() {
   })
 
   describe('GET /api/v1/state-territory/:id', function() {
-    it('should return a specific states or territory', function(done){
+    it('should return a response 200 and a specific states or territory for a state/territory that exists', function(done){
     chai.request(app)
       .get('/api/v1/state-territory/1')
       .end(function (err, res) {
@@ -253,7 +253,7 @@ describe('API Routes', function() {
       })
     })
 
-    it('should return not found for a nonexisting id', function(done){
+    it('should return  a response 404 and the appropriate message for a nonexisting id', function(done){
     chai.request(app)
       .get('/api/v1/state-territory/8999')
       .end(function (err, res) {
@@ -276,7 +276,7 @@ describe('API Routes', function() {
 
 
   describe('GET /api/v1/state-territory/:abbreviation/incidents', function() {
-    it('should return all incidents that occured in a specific state', function(done){
+    it('should return a response 200 and all incidents that occured in a specific state if they exist', function(done){
     chai.request(app)
       .get(`/api/v1/state-territory/WA/incidents`)
       .end(function (err, res) {
@@ -300,7 +300,7 @@ describe('API Routes', function() {
       })
     })
 
-    it('should return not found if there are no incidents for the state', function(done){
+    it('should return a response 404 and the appropriate message if there are no incidents for the state', function(done){
     chai.request(app)
       .get('/api/v1/state-territory/1/incidents')
       .end(function (err, res) {
@@ -313,7 +313,7 @@ describe('API Routes', function() {
   })
 
   describe('GET /api/v1/state-territory/:abbreviation/average', function() {
-    it('should return the average age of victims from a given state/territory', function(done){
+    it('should return a response 200 and the average age of victims from a given state/territory', function(done){
     chai.request(app)
       .get(`/api/v1/state-territory/WA/average`)
       .end(function (err, res) {
@@ -326,7 +326,7 @@ describe('API Routes', function() {
       })
     })
 
-    it('should return the appropriate status and error message when there are no victims from that state', function(done){
+    it('should return a response 404 and the appropriate error message when there are no victims from that state', function(done){
     chai.request(app)
       .get(`/api/v1/state-territory/92/average`)
       .end(function (err, res) {
@@ -338,7 +338,7 @@ describe('API Routes', function() {
   })
 
   describe('POST /api/v1/all', function() {
-    it('should return all incidents with the added incident for a properly formatted request', function(done){
+    it('should return a response 400 and all incidents with the added incident for a properly formatted request', function(done){
     chai.request(app)
       .post(`/api/v1/all`)
       .send({
@@ -371,7 +371,6 @@ describe('API Routes', function() {
         res.body[3].race.should.equal('W');
         res.body[3].city.should.equal('San Francisco');
         res.body[3].state.should.equal('CA');
-      //  res.body[3].stateId.should.equal(4);
         res.body[3].signs_of_mental_illness.should.equal('true');
         res.body[3].threat_level.should.equal('attack');
         res.body[3].flee.should.equal('Not fleeing');
@@ -379,10 +378,48 @@ describe('API Routes', function() {
         done()
       })
     })
+
+    it('should return a status 422 and error message if the request does not include all properties', function(done){
+    chai.request(app)
+      .post(`/api/v1/all`)
+      .send({name: 'Sad', date: '2016-02-05'})
+      .end(function (err, res) {
+        res.should.have.status(422)
+        res.body.error.should.equal('All properties are not provided')
+        done()
+      })
+    })
+
+    it('should return a status 422 and error message of incorrect format if the request body includes unexpected values', function(done){
+    chai.request(app)
+      .post(`/api/v1/all`)
+      .send({
+        name: 'Matthew Hoffman',
+        date: '2015-01-04',
+        manner_of_death: 'shot',
+        armed: 'toy weapon',
+        age: 32,
+        gender: 'M',
+        race: 'W',
+        city: 'San Francisco',
+        state: 'CA',
+        stateId: 4,
+        signs_of_mental_illness: 'true',
+        threat_level: 'attack',
+        flee: 'Not fleeing',
+        body_camera: 'false',
+        prosected: 'doubtful'
+      })
+      .end(function (err, res) {
+        res.should.have.status(422)
+        res.body.error.should.equal('incorrect format')
+        done()
+      })
+    })
   })
 
 describe('POST /api/v1/state-territory', function() {
-  it('should return all states belonging to the specifed folder, including the added state', function(done){
+  it('should return a response 200 and all states belonging to the specifed folder, including the added state', function(done){
   chai.request(app)
     .post(`/api/v1/state-territory`)
     .send({name: 'Florida', abbreviation: 'FL'})
@@ -400,7 +437,7 @@ describe('POST /api/v1/state-territory', function() {
     })
   })
 
-  it('should return a status 422 and error message of all properties are not provided if the request does not include an abbreviation', function(done){
+  it('should return a status 422 and error message of all properties are not provided if all properties aren\'t provided', function(done){
   chai.request(app)
     .post(`/api/v1/state-territory`)
     .send({name: 'Florida'})
@@ -411,18 +448,7 @@ describe('POST /api/v1/state-territory', function() {
     })
   })
 
-  it('should return a status 422 and error message of all properties are not provided if the request does not include an name', function(done){
-  chai.request(app)
-    .post(`/api/v1/state-territory`)
-    .send({abbreviation: 'FL'})
-    .end(function (err, res) {
-      res.should.have.status(422)
-      res.body.error.should.equal('All properties are not provided')
-      done()
-    })
-  })
-
-  it('should return a status 400 and error message of incorrect format if the request body includes values other than name and abbreviation', function(done){
+  it('should return a status 422 and error message of incorrect format if the request body includes values other than name and abbreviation', function(done){
   chai.request(app)
     .post(`/api/v1/state-territory`)
     .send({name: 'Alaska', abbreviation: 'AK', moose: 'for dayzz'})
@@ -434,8 +460,102 @@ describe('POST /api/v1/state-territory', function() {
   })
 })
 
+describe('PATCH /api/v1/all/:id', function() {
+  it('should return a response 200 and the updated incident for proper ids', function(done){
+  chai.request(app)
+    .patch('/api/v1/all/1')
+    .send({
+            name: 'Tim Elliot',
+            date: '2015-01-02',
+            manner_of_death: 'shot',
+            armed: 'gun',
+            age: 23,
+            gender: 'M',
+            race: 'A',
+            city: 'Shelton',
+            state: 'WA',
+            signs_of_mental_illness: 'true',
+            threat_level: 'attack',
+            flee: 'Not fleeing',
+            body_camera: 'true'
+          })
+    .end(function (err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('array');
+      res.body.length.should.equal(1);
+      res.body[0].name.should.equal('Tim Elliot');
+      res.body[0].date.should.equal('2015-01-02');
+      res.body[0].manner_of_death.should.equal('shot');
+      res.body[0].age.should.equal(23);
+      res.body[0].gender.should.equal('M');
+      res.body[0].race.should.equal('A');
+      res.body[0].city.should.equal('Shelton');
+      res.body[0].state.should.equal('WA');
+      res.body[0].signs_of_mental_illness.should.equal('true');
+      res.body[0].threat_level.should.equal('attack');
+      res.body[0].flee.should.equal('Not fleeing');
+      res.body[0].body_camera.should.equal('true');
+      done()
+    })
+  })
+
+  it('should return a response 404 and the appropriate error message for nonexisting ids', function(done){
+  chai.request(app)
+    .patch('/api/v1/all/55')
+    .send({
+            name: 'Tim Elliot',
+            date: '2015-01-02',
+            manner_of_death: 'shot',
+            armed: 'gun',
+            age: 23,
+          })
+    .end(function (err, res) {
+      res.should.have.status(404);
+      res.should.be.json;
+      res.body.error.should.equal('no incidents for this id');
+      done()
+    })
+  })
+})
+
+describe('PATCH /api/v1/state-territory/:id', function() {
+  it('should return a response 200 and the updated incident for proper ids', function(done){
+  chai.request(app)
+    .patch('/api/v1/state-territory/1')
+    .send({
+            name: 'Narnia',
+            abbreviation: 'NA'
+          })
+    .end(function (err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('array');
+      res.body.length.should.equal(1);
+      res.body[0].name.should.equal('Narnia');
+      res.body[0].abbreviation.should.equal('NA');
+      done()
+    })
+  })
+
+  it('should return a response 404 and the appropriate error message for nonexisting ids', function(done){
+  chai.request(app)
+    .patch('/api/v1/state-territory/55')
+    .send({
+            name: 'Middle Earth',
+            abbreviation: 'MEE'
+          })
+    .end(function (err, res) {
+      res.should.have.status(404);
+      res.should.be.json;
+      res.body.error.should.equal('no states or territories for this id');
+      done()
+    })
+  })
+})
+
 describe('DELETE /api/v1/all/:id', function() {
-  it('should delete a specific incident', function(done){
+  it('should return a response 200 and delete a specific incident', function(done){
   chai.request(app)
     .delete('/api/v1/all/1')
     .end(function (err, res) {
@@ -459,7 +579,7 @@ describe('DELETE /api/v1/all/:id', function() {
 })
 
 describe('DELETE /api/v1/state-territory/:id', function() {
-  it('should delete a specific state or territory', function(done){
+  it('should respond with a 200 status and delete a specific state or territory', function(done){
   chai.request(app)
     .delete('/api/v1/state-territory/1')
     .end(function (err, res) {
