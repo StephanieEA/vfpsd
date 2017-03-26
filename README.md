@@ -12,8 +12,8 @@ Thus far, this is a simple restful API which largely conforms to the JSON API st
 
 ## Endpoints
 [heroku](https://fatal-police-shootings.herokuapp.com/)
-*There is no information at the base route, you must go to a specific endpoint to see any data.
-*All successful calls return a status 200.
+* There is no information at the base route, you must go to a specific endpoint to see any data.
+* All successful calls return a status 200.
 
 *****
 
@@ -90,7 +90,7 @@ Thus far, this is a simple restful API which largely conforms to the JSON API st
 
 ### /api/v1/race
 
-#### Get will return the national ratios of victims by race
+#### GET will return the national ratios of victims by race
 (W: White, non-Hispanic
 B: Black, non-Hispanic
 A: Asian
