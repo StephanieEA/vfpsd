@@ -29,7 +29,7 @@ app.get('/api/v1/all', (request, response) => {
           return incident.state == state})
         if (filtered_data.length == 0) {
           response.status(404).send({
-            data: 'There are no incidents for this state/territory- check your spelling'
+            error: 'There are no incidents for this state/territory- check your spelling'
           })
         } else {
           response.status(200).send(filtered_data)
@@ -44,16 +44,16 @@ app.get('/api/v1/all', (request, response) => {
   });
 })
 
-// get a specific incident by it's id
+// get a specific incident by id
 app.get('/api/v1/all/:id', (request, response) => {
   const { id } = request.params
 
   database('fatal_police_shootings_data').where('id', id)
     .then((fatal_police_shootings_data) => {
       if (fatal_police_shootings_data.length == 0) {
-        response.status(404).json('double check the id')
+        response.status(404).send({error: 'double check the id'})
       } else {
-        response.status(200).json(fatal_police_shootings_data)
+        response.status(200).send(fatal_police_shootings_data)
       }
     })
     .catch((error) => {
@@ -65,7 +65,7 @@ app.get('/api/v1/all/:id', (request, response) => {
 app.get('/api/v1/state-territory', (request, response) => {
   database('states_and_territories').select()
     .then((states_and_territories) => {
-      response.status(200).json(states_and_territories)
+      response.status(200).send(states_and_territories)
     })
     .catch((error) => {
       response.status(500).send({error: 'somethings wrong with db'})
@@ -78,9 +78,9 @@ app.get('/api/v1/state-territory/:id', (request, response) => {
   database('states_and_territories').where('id', id)
     .then((states_and_territories) => {
       if (states_and_territories.length == 0) {
-        response.status(404).json('no state for that id')
+        response.status(404).send({error: 'no state for that id'})
       } else {
-        response.status(200).json(states_and_territories)
+        response.status(200).send(states_and_territories)
       }
     })
     .catch((error) => {
@@ -94,9 +94,9 @@ app.get('/api/v1/state-territory/:abbreviation/incidents', (request, response) =
  database('fatal_police_shootings_data').where('state', abbreviation)
    .then((fatal_police_shootings_data) => {
      if (fatal_police_shootings_data.length === 0) {
-       response.status(404).json('no incidents found for the place you entered')
+       response.status(404).send({error: 'no incidents found for the place you entered'})
      } else {
-     response.status(200).json(fatal_police_shootings_data)
+     response.status(200).send(fatal_police_shootings_data)
      }
    })
    .catch((error) => {
@@ -109,7 +109,7 @@ app.get('/api/v1/state-territory/:abbreviation/average', (request, response) => 
   const { abbreviation } = request.params
   database('fatal_police_shootings_data').where('state', abbreviation).avg('age')
      .then((average) => {
-       if (average[0].avg == null) {
+       if (average[0].avg === null) {
          response.status(404).send({error: 'no incidents found'})
        } else {
          response.status(200).send(average)
@@ -140,8 +140,8 @@ app.get('/api/v1/body-camera', (request, response) => {
   database('fatal_police_shootings_data').select()
     .then((fatal_police_shootings_data) => {
       const footageValues = fatal_police_shootings_data.map(incident => incident.body_camera)
-      const denominator = footageValues.length
       const count = countValues(footageValues)
+      const denominator = footageValues.length
       const ratios = ratio(count, denominator)
       response.status(200).send({ratios: ratios})
     })
@@ -150,13 +150,13 @@ app.get('/api/v1/body-camera', (request, response) => {
     })
 })
 
-// get ratios for incidents in which the victim was armed or what they were armed with
+// get ratios for incidents in which the victim was armed and if so what they were armed with
 app.get('/api/v1/armed', (request, response) => {
   database('fatal_police_shootings_data').select()
     .then((fatal_police_shootings_data) => {
       const armedValues = fatal_police_shootings_data.map(incident => incident.armed)
-      const denominator = armedValues.length
       const count = countValues(armedValues)
+      const denominator = armedValues.length
       const ratios = ratio(count, denominator)
       response.status(200).send({ratios: ratios})
     })
@@ -170,8 +170,8 @@ app.get('/api/v1/race', (request, response) => {
   database('fatal_police_shootings_data').select()
     .then((fatal_police_shootings_data) => {
       const raceValues = fatal_police_shootings_data.map(incident => incident.race)
-      const denominator = raceValues.length
       const count = countValues(raceValues)
+      const denominator = raceValues.length
       const ratios = ratio(count, denominator)
       response.status(200).send({ratios: ratios})
     })
@@ -217,6 +217,7 @@ app.post('/api/v1/state-territory', (request, response) => {
     response.status(422).send({error: 'incorrect format'})
   } else {
     const { name, abbreviation } = request.body
+
     if (!name || !abbreviation) {
      response.status(422).send({error: 'All properties are not provided'})
     } else {
@@ -244,7 +245,7 @@ app.patch('/api/v1/all/:id', (request, response) => {
     .then(() => {
       database('fatal_police_shootings_data').where('id', id).select()
       .then((fatal_police_shootings_data) => {
-        if (fatal_police_shootings_data.length == 0) {
+        if (fatal_police_shootings_data.length === 0) {
           response.status(404).send({error: 'no incidents for this id'})
         } else {
           response.status(200).send(fatal_police_shootings_data)
@@ -264,7 +265,7 @@ app.patch('/api/v1/state-territory/:id', (request, response) => {
     .then(() => {
       database('states_and_territories').where('id', id).select()
       .then((states_and_territories) => {
-        if (states_and_territories.length == 0){
+        if (states_and_territories.length === 0){
           response.status(404).send({error: 'no states or territories for this id'})
         } else {
           response.status(200).send(states_and_territories)

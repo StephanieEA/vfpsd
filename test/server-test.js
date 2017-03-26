@@ -156,7 +156,7 @@ describe('API Routes', function() {
       .end(function (err, res) {
         res.should.have.status(404);
         res.should.be.json;
-        res.body.data.should.equal('There are no incidents for this state/territory- check your spelling');
+        res.body.error.should.equal('There are no incidents for this state/territory- check your spelling');
         done()
       })
     })
@@ -167,7 +167,7 @@ describe('API Routes', function() {
       .end(function (err, res) {
         res.should.have.status(404);
         res.should.be.json;
-        res.body.data.should.equal('There are no incidents for this state/territory- check your spelling');
+        res.body.error.should.equal('There are no incidents for this state/territory- check your spelling');
         done()
       })
     })
@@ -204,7 +204,8 @@ describe('API Routes', function() {
       .end(function (err, res) {
         res.should.have.status(404);
         res.should.be.json;
-        res.body.should.equal('double check the id');
+        res.body.should.have.property('error')
+        res.body.error.should.equal('double check the id');
         done()
       })
     })
@@ -259,7 +260,8 @@ describe('API Routes', function() {
       .end(function (err, res) {
         res.should.have.status(404);
         res.should.be.json;
-        res.body.should.equal('no state for that id');
+        res.body.should.have.property('error')
+        res.body.error.should.equal('no state for that id');
         done()
       })
     })
@@ -306,7 +308,8 @@ describe('API Routes', function() {
       .end(function (err, res) {
         res.should.have.status(404);
         res.should.be.json;
-        res.body.should.equal('no incidents found for the place you entered');
+        res.body.should.have.property('error')
+        res.body.error.should.equal('no incidents found for the place you entered');
         done()
       })
     })
@@ -331,6 +334,7 @@ describe('API Routes', function() {
       .get(`/api/v1/state-territory/92/average`)
       .end(function (err, res) {
         res.should.have.status(404);
+        res.body.should.have.property('error')
         res.body.error.should.equal('no incidents found')
         done()
       })
@@ -457,6 +461,7 @@ describe('API Routes', function() {
       .send({name: 'Sad', date: '2016-02-05'})
       .end(function (err, res) {
         res.should.have.status(422)
+        res.body.should.have.property('error')
         res.body.error.should.equal('All properties are not provided')
         done()
       })
@@ -484,6 +489,7 @@ describe('API Routes', function() {
       })
       .end(function (err, res) {
         res.should.have.status(422)
+        res.body.should.have.property('error')
         res.body.error.should.equal('incorrect format')
         done()
       })
@@ -515,6 +521,7 @@ describe('POST /api/v1/state-territory', function() {
     .send({name: 'Florida'})
     .end(function (err, res) {
       res.should.have.status(422)
+      res.body.should.have.property('error')
       res.body.error.should.equal('All properties are not provided')
       done()
     })
@@ -526,6 +533,7 @@ describe('POST /api/v1/state-territory', function() {
     .send({name: 'Alaska', abbreviation: 'AK', moose: 'for dayzz'})
     .end(function (err, res) {
       res.should.have.status(422)
+      res.body.should.have.property('error')
       res.body.error.should.equal('incorrect format')
       done()
     })
@@ -585,6 +593,7 @@ describe('PATCH /api/v1/all/:id', function() {
     .end(function (err, res) {
       res.should.have.status(404);
       res.should.be.json;
+      res.body.should.have.property('error')
       res.body.error.should.equal('no incidents for this id');
       done()
     })
@@ -620,6 +629,7 @@ describe('PATCH /api/v1/state-territory/:id', function() {
     .end(function (err, res) {
       res.should.have.status(404);
       res.should.be.json;
+      res.body.should.have.property('error')
       res.body.error.should.equal('no states or territories for this id');
       done()
     })
@@ -644,6 +654,7 @@ describe('DELETE /api/v1/all/:id', function() {
     .end(function (err, res) {
       res.should.have.status(404);
       res.should.be.json;
+      res.body.should.have.property('error')
       res.body.error.should.equal('id not found');
       done()
     })
