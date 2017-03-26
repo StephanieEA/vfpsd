@@ -414,7 +414,7 @@ describe('API Routes', function() {
   })
 
   describe('POST /api/v1/all', function() {
-    it('should return a response 400 and all incidents with the added incident for a properly formatted request', function(done){
+    it('should return a response 200 and all incidents with the added incident for a properly formatted request', function(done){
     chai.request(app)
       .post(`/api/v1/all`)
       .send({
