@@ -102,4 +102,4 @@ U: unknown)
 
 ## Testing
 
-![Testing Screenshot](Screen Shot 2017-03-25 at 11.25.41 PM.png)
+![Testing Screenshot](https://github.com/StephanieEA/byob/blob/master/Screen%20Shot%202017-03-25%20at%2011.25.41%20PM.png)
