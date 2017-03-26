@@ -22,31 +22,32 @@ app.locals.title = 'Fatal Police Shootings'
 app.get('/api/v1/all', (request, response) => {
   const state = request.query.state
 
-    database('fatal_police_shootings_data').select()
-      .then((fatal_police_shootings_data) => {
-        if (state) {
-          const filtered_data = fatal_police_shootings_data.filter((incident) => {
-            return incident.state == state})
-          if (filtered_data.length == 0) {
-            response.status(404).send({
-              data: 'There are no incidents for this state/territory- check your spelling'
-            })
-          } else {
-            response.status(200).send(filtered_data)
-          }
-        } else  {
-          response.status(200).send(fatal_police_shootings_data)
+  database('fatal_police_shootings_data').select()
+    .then((fatal_police_shootings_data) => {
+      if (state) {
+        const filtered_data = fatal_police_shootings_data.filter((incident) => {
+          return incident.state == state})
+        if (filtered_data.length == 0) {
+          response.status(404).send({
+            data: 'There are no incidents for this state/territory- check your spelling'
+          })
+        } else {
+          response.status(200).send(filtered_data)
         }
-      })
-      .catch(function(error) {
-        response.sendStatus(500)
-        console.error('somethings wrong with db')
-    });
+      } else  {
+        response.status(200).send(fatal_police_shootings_data)
+      }
+    })
+    .catch(function(error) {
+      response.sendStatus(500)
+      console.error('somethings wrong with db')
+  });
 })
 
 // get a specific incident by it's id
 app.get('/api/v1/all/:id', (request, response) => {
   const { id } = request.params
+
   database('fatal_police_shootings_data').where('id', id)
     .then((fatal_police_shootings_data) => {
       if (fatal_police_shootings_data.length == 0) {
@@ -67,8 +68,7 @@ app.get('/api/v1/state-territory', (request, response) => {
       response.status(200).json(states_and_territories)
     })
     .catch((error) => {
-      response.sendStatus(500)
-      console.error('somethings wrong with db')
+      response.status(500).send({error: 'somethings wrong with db'})
   })
 })
 
@@ -84,7 +84,7 @@ app.get('/api/v1/state-territory/:id', (request, response) => {
       }
     })
     .catch((error) => {
-      response.sendStatus(500)
+      response.status(500).send({error: 'somethings wrong with db'})
     })
 })
 
@@ -100,7 +100,7 @@ app.get('/api/v1/state-territory/:abbreviation/incidents', (request, response) =
      }
    })
    .catch((error) => {
-     response.sendStatus(500)
+     response.status(500).send({error: 'somethings wrong with db'})
    })
 })
 
@@ -116,7 +116,7 @@ app.get('/api/v1/state-territory/:abbreviation/average', (request, response) => 
        }
      })
     .catch((error) => {
-      response.sendStatus(500)
+      response.status(500).send({error: 'somethings wrong with db'})
     })
 })
 
@@ -185,12 +185,16 @@ app.post('/api/v1/all', (request, response) => {
   if (Object.keys(request.body).length > 14) {
     response.status(422).send({error: 'incorrect format'})
   } else {
-    const { name, date, manner_of_death, armed, age, gender, race, city, state, signs_of_mental_illness, threat_level, flee, body_camera } = request.body
+    const { name, date, manner_of_death, armed, age, gender, race, city, state,
+      signs_of_mental_illness, threat_level, flee, body_camera } = request.body
 
-    if ( !body_camera || !name || !date || !manner_of_death || !armed || !age || !gender || !race || !city || !state || !signs_of_mental_illness || !threat_level || !flee || !body_camera) {
+    if ( !body_camera || !name || !date || !manner_of_death || !armed || !age ||
+      !gender || !race || !city || !state || !signs_of_mental_illness ||
+      !threat_level || !flee || !body_camera) {
       response.status(422).send({error: 'All properties are not provided'})
     } else {
-      const incident = { name, date, manner_of_death, armed, age, gender, race, city, state, signs_of_mental_illness, threat_level, flee, body_camera }
+      const incident = { name, date, manner_of_death, armed, age, gender, race,
+        city, state, signs_of_mental_illness, threat_level, flee, body_camera }
 
       database('fatal_police_shootings_data').insert(incident)
       .then(() => {
@@ -198,10 +202,10 @@ app.post('/api/v1/all', (request, response) => {
         .then((fatal_police_shootings_data) => {
           response.status(200).json(fatal_police_shootings_data)
         })
-        .catch((error) => {
-          console.error('somethings wrong with db')
-          response.sendStatus(500)
-        })
+      })
+      .catch((error) => {
+        console.error('somethings wrong with db')
+        response.sendStatus(500)
       })
     }
   }
@@ -224,9 +228,9 @@ app.post('/api/v1/state-territory', (request, response) => {
           .then((states_and_territories) => {
             response.status(200).send(states_and_territories)
           })
-          .catch((error) => {
-            response.status(500).send({error: 'something\'s wrong with db'})
-          })
+        })
+        .catch((error) => {
+          response.status(500).send({error: 'something\'s wrong with db'})
         })
     }
   }
@@ -247,6 +251,9 @@ app.patch('/api/v1/all/:id', (request, response) => {
         }
       })
     })
+    .catch((error) => {
+      response.status(500).send({error: 'something\'s wrong with db'})
+    })
 })
 
 // update information for a state
@@ -263,6 +270,9 @@ app.patch('/api/v1/state-territory/:id', (request, response) => {
           response.status(200).send(states_and_territories)
         }
       })
+    })
+    .catch((error) => {
+      response.status(500).send({error: 'something\'s wrong with db'})
     })
 })
 
