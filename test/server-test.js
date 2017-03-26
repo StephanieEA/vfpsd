@@ -62,7 +62,7 @@ describe('API Routes', function() {
         signs_of_mental_illness: 'false',
         threat_level: 'other',
         flee: 'Not fleeing',
-        body_camera: 'false'
+        body_camera: 'true'
       }
     ]
 
@@ -337,6 +337,78 @@ describe('API Routes', function() {
     })
   })
 
+  describe('GET /api/v1/all/mental-illness', function() {
+    it('should return a response 200 and the national ratio for incidents in which mental illness was clearly a factor', function(done){
+    chai.request(app)
+      .get('/api/v1/mental-illness')
+      .end(function (err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        res.body.ratios.should.have.property('true')
+        res.body.ratios.should.have.property('false')
+        res.body.ratios.true.should.equal(0.3333333333333333)
+        res.body.ratios.false.should.equal(0.6666666666666666)
+        done()
+      })
+    })
+  })
+
+  describe('GET /api/v1/all/body-camera', function() {
+    it('should return a response 200 and the national ratio for incidents in which there is body camera footage', function(done){
+    chai.request(app)
+      .get('/api/v1/body-camera')
+      .end(function (err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        res.body.ratios.should.have.property('true')
+        res.body.ratios.should.have.property('false')
+        res.body.ratios.true.should.equal(0.3333333333333333)
+        res.body.ratios.false.should.equal(0.6666666666666666)
+        done()
+      })
+    })
+  })
+
+  describe('GET /api/v1/armed', function() {
+    it('should return a response 200 and the national ratios for the armed status of victims', function(done){
+    chai.request(app)
+      .get('/api/v1/armed')
+      .end(function (err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        res.body.should.have.property('ratios')
+        res.body.ratios.should.have.property('gun')
+        res.body.ratios.should.have.property('unarmed')
+        res.body.ratios.gun.should.equal(0.6666666666666666)
+        res.body.ratios.unarmed.should.equal(0.3333333333333333)
+        done()
+      })
+    })
+  })
+
+  describe('GET /api/v1/race', function() {
+    it('should return a response 200 and the national ratios for the race of victims', function(done){
+    chai.request(app)
+      .get('/api/v1/race')
+      .end(function (err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        res.body.should.have.property('ratios')
+        res.body.ratios.should.have.property('W')
+        res.body.ratios.should.have.property('A')
+        res.body.ratios.should.have.property('H')
+        res.body.ratios.W.should.equal(0.3333333333333333)
+        res.body.ratios.A.should.equal(0.3333333333333333)
+        res.body.ratios.H.should.equal(0.3333333333333333)
+        done()
+      })
+    })
+  })
+
   describe('POST /api/v1/all', function() {
     it('should return a response 400 and all incidents with the added incident for a properly formatted request', function(done){
     chai.request(app)
@@ -566,7 +638,7 @@ describe('DELETE /api/v1/all/:id', function() {
     })
   })
 
-  it('should respond with a 404, message of id not found, if the state does not exist', function(done){
+  it('should respond with a 404, message of id not found, if the incident does not exist', function(done){
   chai.request(app)
     .delete('/api/v1/all/999')
     .end(function (err, res) {

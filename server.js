@@ -7,6 +7,9 @@ const bodyParser = require('body-parser')
 
 const app = express()
 
+const countValues = require('./helpers/helpers.js').countValues
+const ratio = require('./helpers/helpers.js').ratio
+
 app.use(express.static('index.html'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -17,7 +20,7 @@ app.locals.title = 'Fatal Police Shootings'
 
 // get all data
 app.get('/api/v1/all', (request, response) => {
-  const state = request.query.state;
+  const state = request.query.state
 
     database('fatal_police_shootings_data').select()
       .then((fatal_police_shootings_data) => {
@@ -25,14 +28,14 @@ app.get('/api/v1/all', (request, response) => {
           const filtered_data = fatal_police_shootings_data.filter((incident) => {
             return incident.state == state})
           if (filtered_data.length == 0) {
-            response.status(404).json({
+            response.status(404).send({
               data: 'There are no incidents for this state/territory- check your spelling'
             })
           } else {
-            response.status(200).json(filtered_data)
+            response.status(200).send(filtered_data)
           }
         } else  {
-          response.status(200).json(fatal_police_shootings_data)
+          response.status(200).send(fatal_police_shootings_data)
         }
       })
       .catch(function(error) {
@@ -109,11 +112,71 @@ app.get('/api/v1/state-territory/:abbreviation/average', (request, response) => 
        if (average[0].avg == null) {
          response.status(404).send({error: 'no incidents found'})
        } else {
-         response.status(200).json(average)
+         response.status(200).send(average)
        }
      })
     .catch((error) => {
       response.sendStatus(500)
+    })
+})
+
+// get the ratio of national instances in which mental illness was a factor
+app.get('/api/v1/mental-illness', (request, response) => {
+  database('fatal_police_shootings_data').select()
+    .then((fatal_police_shootings_data) => {
+      const mIValues = fatal_police_shootings_data.map(incident => incident.signs_of_mental_illness)
+      const denominator = mIValues.length
+      const count = countValues(mIValues)
+      const ratios = ratio(count, denominator)
+      response.status(200).send({ratios: ratios})
+    })
+    .catch((error) => {
+      response.sendStatus(500).send({error: 'servers error'})
+    })
+})
+
+// get the ratio of national instances in which there is body camera footage
+app.get('/api/v1/body-camera', (request, response) => {
+  database('fatal_police_shootings_data').select()
+    .then((fatal_police_shootings_data) => {
+      const footageValues = fatal_police_shootings_data.map(incident => incident.body_camera)
+      const denominator = footageValues.length
+      const count = countValues(footageValues)
+      const ratios = ratio(count, denominator)
+      response.status(200).send({ratios: ratios})
+    })
+    .catch((error) => {
+      response.sendStatus(500).send({error: 'servers error'})
+    })
+})
+
+// get ratios for incidents in which the victim was armed or what they were armed with
+app.get('/api/v1/armed', (request, response) => {
+  database('fatal_police_shootings_data').select()
+    .then((fatal_police_shootings_data) => {
+      const armedValues = fatal_police_shootings_data.map(incident => incident.armed)
+      const denominator = armedValues.length
+      const count = countValues(armedValues)
+      const ratios = ratio(count, denominator)
+      response.status(200).send({ratios: ratios})
+    })
+    .catch((error) => {
+      response.sendStatus(500).send({error: 'servers error'})
+    })
+})
+
+// get the ratios for incidents by race
+app.get('/api/v1/race', (request, response) => {
+  database('fatal_police_shootings_data').select()
+    .then((fatal_police_shootings_data) => {
+      const raceValues = fatal_police_shootings_data.map(incident => incident.race)
+      const denominator = raceValues.length
+      const count = countValues(raceValues)
+      const ratios = ratio(count, denominator)
+      response.status(200).send({ratios: ratios})
+    })
+    .catch((error) => {
+      response.sendStatus(500).send({error: 'servers error'})
     })
 })
 
@@ -159,7 +222,7 @@ app.post('/api/v1/state-territory', (request, response) => {
         .then(() => {
           database('states_and_territories').select()
           .then((states_and_territories) => {
-            response.status(200).json(states_and_territories)
+            response.status(200).send(states_and_territories)
           })
           .catch((error) => {
             response.status(500).send({error: 'something\'s wrong with db'})
@@ -211,7 +274,7 @@ app.delete('/api/v1/all/:id', (request, response) => {
         if(fatal_police_shootings_data === 0){
           response.status(404).send({error: 'id not found'})
         } else {
-          response.status(200).json({message: `incident for id ${id} deleted`})
+          response.status(200).send({message: `incident for id ${id} deleted`})
         }
       })
       .catch((error) => {
