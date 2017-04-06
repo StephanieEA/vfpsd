@@ -1,9 +1,9 @@
-# BYOB
+# Fatal Police Shootings in the US
 
-## An API for Fatal Police Shooting Data
+## An API and Visualization of the data collected by the Washington Post surrounding fatal police shootings in the United States
 
 ### Data From the Washington Post
-* last updated 3/20/2017
+* last updated 4/5/2017
 [Link to original data source](https://github.com/washingtonpost/data-police-shootings)
 
 
@@ -101,5 +101,3 @@ U: unknown)
 
 
 ## Testing
-
-![Testing Screenshot](https://github.com/StephanieEA/byob/blob/master/Screen%20Shot%202017-03-25%20at%2011.25.41%20PM.png)
