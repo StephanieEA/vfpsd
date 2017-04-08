@@ -7,7 +7,7 @@ exports.up = function(knex, Promise) {
             table.string('date'),
             table.string('manner_of_death'),
             table.string('armed')
-            table.integer('age'),
+            table.string('age'),
             table.string('gender'),
             table.string('race'),
             table.string('city'),
