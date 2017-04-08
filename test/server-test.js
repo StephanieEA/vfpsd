@@ -126,18 +126,18 @@ describe('API Routes', function() {
       })
     })
 
-    it('should return status 200 and the appropriate data for a query by state that exists', function(done){
+    it('should return status 200 and the appropriate data for a query by year that exists', function(done){
     chai.request(app)
-      .get('/api/v1/all?state=WA')
+      .get('/api/v1/all?year=2015')
       .end(function (err, res) {
         res.should.have.status(200);
         res.should.be.json;
         res.body.should.be.a('array');
-        res.body.length.should.equal(1);
+        res.body.length.should.equal(3);
         res.body[0].name.should.equal('Tim Elliot');
         res.body[0].date.should.equal('2015-01-02');
         res.body[0].manner_of_death.should.equal('shot');
-        res.body[0].age.should.equal(53);
+        res.body[0].age.should.equal('53');
         res.body[0].gender.should.equal('M');
         res.body[0].race.should.equal('A');
         res.body[0].city.should.equal('Shelton');
@@ -152,22 +152,22 @@ describe('API Routes', function() {
 
     it('should return a status 404 and the appropriate message for a query by state when none exists', function(done){
     chai.request(app)
-      .get('/api/v1/all?state=GA')
+      .get('/api/v1/all?year=2089')
       .end(function (err, res) {
         res.should.have.status(404);
         res.should.be.json;
-        res.body.error.should.equal('There are no incidents for this state/territory- check your spelling');
+        res.body.error.should.equal('There are no incidents for this year');
         done()
       })
     })
 
     it('should return a status 404 and the appropriate message when the query by state is innacurate', function(done){
     chai.request(app)
-      .get('/api/v1/all?state=GAA')
+      .get('/api/v1/all?year=GAA')
       .end(function (err, res) {
         res.should.have.status(404);
         res.should.be.json;
-        res.body.error.should.equal('There are no incidents for this state/territory- check your spelling');
+        res.body.error.should.equal('There are no incidents for this year');
         done()
       })
     })
@@ -289,7 +289,7 @@ describe('API Routes', function() {
         res.body[0].name.should.equal('Tim Elliot');
         res.body[0].date.should.equal('2015-01-02');
         res.body[0].manner_of_death.should.equal('shot');
-        res.body[0].age.should.equal(53);
+        res.body[0].age.should.equal('53');
         res.body[0].gender.should.equal('M');
         res.body[0].race.should.equal('A');
         res.body[0].city.should.equal('Shelton');
@@ -310,32 +310,6 @@ describe('API Routes', function() {
         res.should.be.json;
         res.body.should.have.property('error')
         res.body.error.should.equal('no incidents found for the place you entered');
-        done()
-      })
-    })
-  })
-
-  describe('GET /api/v1/state-territory/:abbreviation/average', function() {
-    it('should return a response 200 and the average age of victims from a given state/territory', function(done){
-    chai.request(app)
-      .get(`/api/v1/state-territory/WA/average`)
-      .end(function (err, res) {
-        res.should.have.status(200);
-        res.should.be.json;
-        res.body.should.be.a('array');
-        res.body.length.should.equal(1);
-        res.body[0].avg.should.equal('53.0000000000000000')
-        done()
-      })
-    })
-
-    it('should return a response 404 and the appropriate error message when there are no victims from that state', function(done){
-    chai.request(app)
-      .get(`/api/v1/state-territory/92/average`)
-      .end(function (err, res) {
-        res.should.have.status(404);
-        res.body.should.have.property('error')
-        res.body.error.should.equal('no incidents found')
         done()
       })
     })
@@ -442,7 +416,7 @@ describe('API Routes', function() {
         res.body[3].date.should.equal('2015-01-04');
         res.body[3].manner_of_death.should.equal('shot');
         res.body[3].armed.should.equal('toy weapon');
-        res.body[3].age.should.equal(32);
+        res.body[3].age.should.equal('32');
         res.body[3].gender.should.equal('M');
         res.body[3].race.should.equal('W');
         res.body[3].city.should.equal('San Francisco');
@@ -567,7 +541,7 @@ describe('PATCH /api/v1/all/:id', function() {
       res.body[0].name.should.equal('Tim Elliot');
       res.body[0].date.should.equal('2015-01-02');
       res.body[0].manner_of_death.should.equal('shot');
-      res.body[0].age.should.equal(23);
+      res.body[0].age.should.equal('23');
       res.body[0].gender.should.equal('M');
       res.body[0].race.should.equal('A');
       res.body[0].city.should.equal('Shelton');

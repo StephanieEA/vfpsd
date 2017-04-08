@@ -104,21 +104,6 @@ app.get('/api/v1/state-territory/:abbreviation/incidents', (request, response) =
    })
 })
 
-// get average age of victims from specific states
-app.get('/api/v1/state-territory/:abbreviation/average', (request, response) => {
-  const { abbreviation } = request.params
-  database('fatal_police_shootings_data').where('state', abbreviation).avg('age')
-     .then((average) => {
-       if (average[0].avg === null) {
-         response.status(404).send({error: 'no incidents found'})
-       } else {
-         response.status(200).send(average)
-       }
-     })
-    .catch((error) => {
-      response.status(500).send({error: 'somethings wrong with db'})
-    })
-})
 
 // get the ratio of national instances in which mental illness was a factor
 app.get('/api/v1/mental-illness', (request, response) => {
