@@ -20,16 +20,16 @@ app.locals.title = 'Fatal Police Shootings'
 
 // get all data
 app.get('/api/v1/all', (request, response) => {
-  const state = request.query.state
+  const year = request.query.year
 
   database('fatal_police_shootings_data').select()
     .then((fatal_police_shootings_data) => {
-      if (state) {
+      if (year) {
         const filtered_data = fatal_police_shootings_data.filter((incident) => {
-          return incident.state == state})
+          return incident.date.includes(year)})
         if (filtered_data.length == 0) {
           response.status(404).send({
-            error: 'There are no incidents for this state/territory- check your spelling'
+            error: 'There are no incidents for this year'
           })
         } else {
           response.status(200).send(filtered_data)

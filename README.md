@@ -6,7 +6,6 @@
 * last updated 4/5/2017
 [Link to original data source](https://github.com/washingtonpost/data-police-shootings)
 
-
 ## Overview
 Thus far, this is a simple restful API which largely conforms to the JSON API standard. The server is built on node-express, and connects to a postgres db via knex. Endpoints are tested using Mocha Chai.  There are two tables, one for all of the data provided from the Washington post and one for states.  All endpoints respond with appropriate status codes and JSON.  For this version, the api does not use pagination or contain data as a top level header, which the standard calls for.  Byob is so limited in its scope at this time, that it isn't cost/time effective to meet these requirements.
 
@@ -20,8 +19,8 @@ Thus far, this is a simple restful API which largely conforms to the JSON API st
 ### /api/v1/all
 
 #### GET will return all of the incidents of fatal police shootings documented by WashPo as of 3/20/17.
-* It does accept a query by state/territory abbreviation, For example: ?state=GA will return all of the incidents that have occurred in GA.
-* It will return a 404 and an appropriate message if there are no incidents for that state or if the state abbreviation is misspelled.
+* It does accept a query by year, For example: ?year=2016 will return all of the incidents that have occurred in 2016.
+* It will return a 404 and an appropriate message if there are no incidents for that year.
 
 
 #### POST will return all incidents, including the one that was added.
