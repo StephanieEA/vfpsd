@@ -104,7 +104,6 @@ app.get('/api/v1/state-territory/:abbreviation/incidents', (request, response) =
    })
 })
 
-
 // get the ratio of national instances in which mental illness was a factor
 app.get('/api/v1/mental-illness', (request, response) => {
   database('fatal_police_shootings_data').select()
@@ -297,5 +296,6 @@ app.delete('/api/v1/state-territory/:id', (request, response) => {
 app.listen(app.get('port'), () => {
   console.log(`${app.locals.title} is running on ${app.get('port')}.`)
 })
+
 
 module.exports = app
