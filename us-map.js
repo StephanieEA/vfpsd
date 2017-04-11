@@ -1,23 +1,60 @@
-// loop through fpsd to find all cities for each particular state
-var svg = d3.select("svg");
+const width = 960,
+    height = 500;
 
-var path = d3.geoPath();
+const projection = d3.geoAlbersUsa()
+    .scale(1000)
 
-d3.json("https://d3js.org/us-10m.v1.json", (error, us) => {
+const path = d3.geoPath()
+    .projection(projection);
+
+const svg = d3.select("body")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
   if (error) throw error;
+  svg.insert("path", ".graticule")
+        .datum(topojson.feature(us, us.objects.land))
+        .attr("class", "land")
+        .attr("d", path);
 
-  svg.append("g")
-      .attr("class", "states")
-    .selectAll("path")
-    .data(topojson.feature(us, us.objects.states).features)
-    .enter().append("path")
+  svg.insert("path", ".graticule")
+      .datum(topojson.mesh(us, us.objects.states, (a, b) => { return a !== b; }))
+      .attr("class", "state-boundary")
       .attr("d", path);
 
-  svg.append("path")
-      .attr("class", "state-borders")
-      .attr("d", path(topojson.mesh(us, us.objects.states, (a, b) =>
-      { return a !== b; })));
+  var spaceCircles = [[30, 30], [70, 70], [110, 110]];
 
-// use city finder coordinates to map required cities
+  svg.selectAll("circle")
+  		.data(spaceCircles)
+      .enter()
+  		.append("circle")
+  		.attr("cx", d => d[0])
+  		.attr("cy", d => d[1])
+  		.attr("r", 5)
+  		.attr("fill", "red")
 
-});
+
+
+  });
+
+
+  // d3.map(getCitiesForState('AK'), data => {
+  //   svg.selectAll('circle')
+  //     .data(data)
+  //     .enter()
+  //     .append('circle')
+  //     .attr("cx", function(d) {
+  //       return projection([d.lon, d.lat])[0];
+  //     })
+  //     .attr("cy", function(d) {
+  //       return projection([d.lon, d.lat])[1];
+  //     })
+  //     .attr("r", 5)
+  //     .style("fill", black)
+  //     .style("opacity", 0.85)
+  // })
+// });
+
+// getCitiesForState('GA')

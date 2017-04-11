@@ -1,4 +1,4 @@
-exports.countValues = (array) => {
+const countValues = exports.countValues = (array) => {
   return array.reduce((object, value, index) => {
     if (value === null) {
       value = 'U'
@@ -12,7 +12,7 @@ exports.countValues = (array) => {
     }, {})
 }
 
-exports.ratio = (object, denominator) => {
+const ratio = exports.ratio = (object, denominator) => {
   return Object.keys(object).reduce((obj, curr) => {
     return Object.assign(object, {[curr]: object[curr]/denominator})
   }, {})

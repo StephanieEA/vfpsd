@@ -6,13 +6,13 @@ const getCitiesForState = (state) => {
     return array.indexOf(city) === index;
   }))
   .then(incidentCities => {
-    return getCoordinates(state, incidentCities)
+    return getCoordinatesForCities(state, incidentCities)
   })
   .then(response => console.log(response))
   .catch(error => console.log(error))
 }
 
-const getCoordinates = (state, incidentCities) => {
+const getCoordinatesForCities = (state, incidentCities) => {
   return fetch(`http://api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
   .then(response => response.json())
   .then(response => {
@@ -31,5 +31,3 @@ const getCoordinates = (state, incidentCities) => {
   .then(cities => cities.filter(city => city !== false))
   .catch(error => console.log(error))
 }
-
-getCitiesForState('TX')
