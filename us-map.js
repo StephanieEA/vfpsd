@@ -23,38 +23,7 @@ d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
       .datum(topojson.mesh(us, us.objects.states, (a, b) => { return a !== b; }))
       .attr("class", "state-boundary")
       .attr("d", path);
+});
 
-  var spaceCircles = [[30, 30], [70, 70], [110, 110]];
-
-  svg.selectAll("circle")
-  		.data(spaceCircles)
-      .enter()
-  		.append("circle")
-  		.attr("cx", d => d[0])
-  		.attr("cy", d => d[1])
-  		.attr("r", 5)
-  		.attr("fill", "red")
-
-
-
-  });
-
-
-  // d3.map(getCitiesForState('AK'), data => {
-  //   svg.selectAll('circle')
-  //     .data(data)
-  //     .enter()
-  //     .append('circle')
-  //     .attr("cx", function(d) {
-  //       return projection([d.lon, d.lat])[0];
-  //     })
-  //     .attr("cy", function(d) {
-  //       return projection([d.lon, d.lat])[1];
-  //     })
-  //     .attr("r", 5)
-  //     .style("fill", black)
-  //     .style("opacity", 0.85)
-  // })
-// });
-
-// getCitiesForState('GA')
+getCitiesForState('ca')
+getCitiesForState('ga')
