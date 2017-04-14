@@ -9,15 +9,17 @@ const getCitiesForState = (state) => {
       return getCoordinatesForCities(state, incidentCities)
     })
     .then(response => {
-      console.log(response)
+      console.log(response.map(cities => Object.values(cities)))
+      console.log(projection)
       svg.selectAll("circle")
           .data(
-            response.map(city => Object.values(city)).map(array => {
-              return [-array[0].longitude, array[0].latitude]})
+            response.map(cities => Object.values(cities))
+            // response.map(city => Object.values(city)).map(array => {
+            //   return [-array[0].longitude, array[0].latitude]})
           )
           .enter()
           .append("circle")
-          .attr("cx", d => d[0])
+          .attr("cx", d => projection([d.longitude, d.latitude])[0])
           .attr("cy", d => d[1])
           .attr("r", 5)
           .attr("fill", "red")

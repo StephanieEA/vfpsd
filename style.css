@@ -2,11 +2,11 @@ body {
   text-align: center;
 }
 
-.land {
-  fill: #dfdfdf;
-}
-
 .state-boundary {
   fill: none;
   stroke: #fff;
 }
+
+.states {
+  fill: #efefef;
+}oh
