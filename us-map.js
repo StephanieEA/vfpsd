@@ -14,13 +14,17 @@ const svg = d3.select("body")
 
 d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
   if (error) throw error;
-  svg.insert("path", ".graticule")
-        .datum(topojson.feature(us, us.objects.land))
-        .attr("class", "land")
+
+  svg.append("g")
+        .attr("class", "states")
+        .selectAll("path")
+        .data(topojson.feature(us, us.objects.states).features)
+        .enter().append("path")
         .attr("d", path);
 
-  svg.insert("path", ".graticule")
-      .datum(topojson.mesh(us, us.objects.states, (a, b) => { return a !== b; }))
+  svg.insert("path")
+      .datum(topojson.mesh(us, us.objects.states, (a, b) => {
+        return a !== b; }))
       .attr("class", "state-boundary")
       .attr("d", path);
 });

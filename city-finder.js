@@ -10,6 +10,7 @@ const getCitiesForState = (state) => {
     })
     .then(response => {
       console.log(response.map(cities => Object.values(cities)))
+      console.log(projection)
       svg.selectAll("circle")
           .data(
             response.map(cities => Object.values(cities))
