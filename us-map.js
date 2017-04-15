@@ -29,5 +29,5 @@ d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
       .attr("d", path);
 });
 
-getCitiesForState('ak')
+getCitiesForState('ca')
 // getCitiesForState('ga')
