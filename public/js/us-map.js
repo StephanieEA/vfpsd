@@ -12,9 +12,14 @@ const svg = d3.select("body")
     .attr("width", width)
     .attr("height", height);
 
-d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
-  if (error) throw error;
+const renderMap = () => {
+  d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
+    if (error) throw error;
+    plotUS(us)
+  })
+}
 
+const plotUS = (us) => {
   svg.append("g")
         .attr("class", "states")
         .selectAll("path")
@@ -27,7 +32,50 @@ d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
         return a !== b; }))
       .attr("class", "state-boundary")
       .attr("d", path);
-});
+}
 
-getCitiesForState('ca')
-getCitiesForState('co')
+const renderCities = () => {
+  return stateAbbreviations.forEach(state => getCitiesForState(state))
+}
+
+const plotCities = (response) => {
+  const cityCoordinates = response.map(cities => Object.values(cities))
+  svg.selectAll("circle")
+      .data(
+        cityCoordinates
+      )
+      .enter()
+      .append("circle")
+      .attr("cx", d => {
+        return projection([d[0].longitude, d[0].latitude])[0]
+      })
+      .attr("cy", d => {
+        return projection([d[0].longitude, d[0].latitude])[1]
+      })
+      .attr("r", 4.25)
+      .attr("fill", "red")
+      .style("opacity", 0.15)
+  return response
+}
+
+// var tx = () => getCitiesForState('TX')
+// var fl = () => getCitiesForState('FL')
+// var wa = () => getCitiesForState('WA')
+// var ak = () => getCitiesForState('AK')
+// var ca = () => getCitiesForState('CA')
+// var ny = () => getCitiesForState('NY')
+
+// d3.queue()
+//   .defer(renderMap)
+//   // .defer(renderCities)
+//   // .defer(fl)
+//   // .defer(wa)
+//   // .defer(ak)
+//   // .defer(ca)
+//   // .defer(ny)
+//   .await((error) => {
+//     console.log('yo')
+//   })
+
+// renderMap()
+renderCities()

@@ -1,41 +1,13 @@
 const getCitiesForState = (state) => {
-  return fetch(`http://localhost:3000/api/v1/state-territory/${state.toUpperCase()}/incidents`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    }
-  })
+  return fetch(`http://localhost:3000/api/v1/state-territory/${state}/incidents`)
     .then(response => response.json())
     .then(response => response.map(incident => incident.city))
-    .then(cities => cities.filter((city, index, array) => {
-      return array.indexOf(city) === index
-    }))
-    .then(incidentCities => {
-      return getCoordinatesForCities(state, incidentCities)
-    })
+    .then(incidentCities => getCoordinatesForCities(state, incidentCities))
     .then(response => {
-      const cityCoordinates = response.map(cities => Object.values(cities))
-      svg.selectAll("circle")
-          .data(
-            cityCoordinates
-          )
-          .enter()
-          .append("circle")
-          .attr("cx", d => {
-            console.log(`x : ${d[0].longitude}`)
-            console.log(`y : ${d[0].latitude}`)
-            return projection([d[0].longitude, d[0].latitude])[0]
-          })
-          .attr("cy", d => {
-            return projection([d[0].longitude, d[0].latitude])[1]
-          })
-          .attr("r", 4.25)
-          .attr("fill", "red")
-          .style("opacity", 0.15)
+      plotCities(response)
       return response
     })
-    .catch(error => console.log(error))
+  .catch(error => console.log(error))
 }
 
 const getCoordinatesForCities = (state, incidentCities) => {
