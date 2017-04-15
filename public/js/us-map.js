@@ -12,12 +12,13 @@ const svg = d3.select("body")
     .attr("width", width)
     .attr("height", height);
 
-const renderMap = () => {
-  d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
-    if (error) throw error;
-    plotUS(us)
-  })
-}
+
+// const renderMap = () => {
+//   d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
+//     if (error) throw error;
+//     // plotUS(us)
+//   })
+// }
 
 const plotUS = (us) => {
   svg.append("g")
@@ -58,24 +59,11 @@ const plotCities = (response) => {
   return response
 }
 
-// var tx = () => getCitiesForState('TX')
-// var fl = () => getCitiesForState('FL')
-// var wa = () => getCitiesForState('WA')
-// var ak = () => getCitiesForState('AK')
-// var ca = () => getCitiesForState('CA')
-// var ny = () => getCitiesForState('NY')
 
-// d3.queue()
-//   .defer(renderMap)
-//   // .defer(renderCities)
-//   // .defer(fl)
-//   // .defer(wa)
-//   // .defer(ak)
-//   // .defer(ca)
-//   // .defer(ny)
-//   .await((error) => {
-//     console.log('yo')
-//   })
-
-// renderMap()
-renderCities()
+d3.queue()
+  .defer(d3.json, "http://bl.ocks.org/mbostock/raw/4090846/us.json")
+  .await(function(error, us) {
+    if (error) throw error;
+    plotUS(us)
+    renderCities()
+  });
