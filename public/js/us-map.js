@@ -41,6 +41,9 @@ const plotCities = (response) => {
       .enter()
       .append("circle")
       .attr("cx", d => {
+        console.log(`name: ${Object.keys(d)[0]},
+          longitude: ${Object.values(d)[0].longitude}
+        `)
         return projection([Object.values(d)[0].longitude, Object.values(d)[0].latitude])[0]
       })
       .attr("cy", d => {
@@ -50,6 +53,7 @@ const plotCities = (response) => {
       .attr("fill", "red")
       .style("opacity", 0.15)
       .on("mouseover", (d) => {
+        console.log(d)
         tooltip.transition()
          .duration(200)
          .style("opacity", 1);
@@ -68,8 +72,15 @@ const plotCities = (response) => {
 
 d3.queue()
   .defer(d3.json, "http://bl.ocks.org/mbostock/raw/4090846/us.json")
-  .await(function(error, us) {
+  .await((error, us) => {
     if (error) throw error;
     renderUS(us)
+    getCitiesForState('VT')
+      .then(vt => {
+        plotCities(vt)
+      })
     getCitiesForState('AK')
-  });
+      .then(ak => {
+        plotCities(ak)
+      })
+})

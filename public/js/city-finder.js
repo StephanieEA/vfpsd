@@ -4,7 +4,7 @@ const getCitiesForState = (state) => {
     .then(response => response.map(incident => incident.city))
     .then(incidentCities => getCoordinatesForCities(state, incidentCities))
     .then(response => {
-      plotCities(response)
+      // plotCities(response)
       return response
     })
   .catch(error => console.log(error))
