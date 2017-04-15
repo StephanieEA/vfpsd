@@ -23,8 +23,8 @@ const getCitiesForState = (state) => {
           .enter()
           .append("circle")
           .attr("cx", d => {
-            console.log(`x : ${d[0].longitude}`)
-            console.log(`y : ${d[0].latitude}`)
+            // console.log(`x : ${d[0].longitude}`)
+            // console.log(`y : ${d[0].latitude}`)
             return projection([d[0].longitude, d[0].latitude])[0]
           })
           .attr("cy", d => {

@@ -12,9 +12,14 @@ const svg = d3.select("body")
     .attr("width", width)
     .attr("height", height);
 
-d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
-  if (error) throw error;
+// const renderMap = () => {
+//   d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
+//     if (error) throw error;
+//     // plotUS(us)
+//   })
+// }
 
+const plotUS = (us) => {
   svg.append("g")
         .attr("class", "states")
         .selectAll("path")
@@ -27,7 +32,37 @@ d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
         return a !== b; }))
       .attr("class", "state-boundary")
       .attr("d", path);
-});
+}
 
-getCitiesForState('ca')
-getCitiesForState('co')
+const renderCities = () => {
+  const stateAbbreviations = ['AK', 'CA', 'FL', 'WA', 'NY', 'CO']
+  return stateAbbreviations.forEach(state => getCitiesForState(state))
+}
+
+const plotCities = (response) => {
+  const cityCoordinates = response.map(cities => Object.values(cities))
+  svg.selectAll("circle")
+      .data(
+        cityCoordinates
+      )
+      .enter()
+      .append("circle")
+      .attr("cx", d => {
+        return projection([d[0].longitude, d[0].latitude])[0]
+      })
+      .attr("cy", d => {
+        return projection([d[0].longitude, d[0].latitude])[1]
+      })
+      .attr("r", 4.25)
+      .attr("fill", "red")
+      .style("opacity", 0.15)
+  return response
+}
+
+d3.queue()
+  .defer(d3.json, "http://bl.ocks.org/mbostock/raw/4090846/us.json")
+  .await(function(error, us) {
+    if (error) throw error;
+    plotUS(us)
+    renderCities()
+  });
