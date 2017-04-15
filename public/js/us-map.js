@@ -61,5 +61,9 @@ d3.queue()
   .await(function(error, us) {
     if (error) throw error;
     renderUS(us)
-    renderCities()
+    // getCitiesForState('LA')
+    // getCitiesForState('FL')
+    getCitiesForState('GA')
+    getCitiesForState('NY')
+    // renderCities()
   });
