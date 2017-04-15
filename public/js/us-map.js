@@ -1,8 +1,8 @@
-const width = 960,
-    height = 500;
+const width = 900,
+    height = 600;
 
 const projection = d3.geoAlbersUsa()
-    .scale(1000)
+    .scale(1125)
 
 const path = d3.geoPath()
     .projection(projection);
@@ -30,3 +30,4 @@ d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
 });
 
 getCitiesForState('ca')
+getCitiesForState('co')

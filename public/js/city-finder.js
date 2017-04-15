@@ -1,5 +1,11 @@
 const getCitiesForState = (state) => {
-  return fetch(`http://localhost:3000/api/v1/state-territory/${state.toUpperCase()}/incidents`)
+  return fetch(`http://localhost:3000/api/v1/state-territory/${state.toUpperCase()}/incidents`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    }
+  })
     .then(response => response.json())
     .then(response => response.map(incident => incident.city))
     .then(cities => cities.filter((city, index, array) => {

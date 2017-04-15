@@ -16,6 +16,15 @@ Thus far, this is a simple restful API which largely conforms to the JSON API st
 
 *****
 
+### Instructions
+* clone down the repo
+* npm install
+* npm start
+(Because this application makes fetch requests from it's front-end, for development you'll need to use an extension to bypass cors errors- for chrome you could use
+https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?hl=en
+)
+* visit http://localhost:3000
+
 ### /api/v1/all
 
 #### GET will return all of the incidents of fatal police shootings documented by WashPo as of 3/20/17.
