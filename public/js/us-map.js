@@ -12,15 +12,7 @@ const svg = d3.select("body")
     .attr("width", width)
     .attr("height", height);
 
-
-// const renderMap = () => {
-//   d3.json("http://bl.ocks.org/mbostock/raw/4090846/us.json", (error, us) => {
-//     if (error) throw error;
-//     // plotUS(us)
-//   })
-// }
-
-const plotUS = (us) => {
+const renderUS = (us) => {
   svg.append("g")
         .attr("class", "states")
         .selectAll("path")
@@ -36,9 +28,10 @@ const plotUS = (us) => {
 }
 
 const renderCities = () => {
-  return stateAbbreviations.forEach(state => getCitiesForState(state))
+  stateAbbreviations.forEach(state => getCitiesForState(state))
 }
 
+let count = 0
 const plotCities = (response) => {
   const cityCoordinates = response.map(cities => Object.values(cities))
   svg.selectAll("circle")
@@ -48,6 +41,9 @@ const plotCities = (response) => {
       .enter()
       .append("circle")
       .attr("cx", d => {
+        count++
+        console.log(count)
+        console.log(projection([d[0].longitude, d[0].latitude])[0])
         return projection([d[0].longitude, d[0].latitude])[0]
       })
       .attr("cy", d => {
@@ -64,6 +60,6 @@ d3.queue()
   .defer(d3.json, "http://bl.ocks.org/mbostock/raw/4090846/us.json")
   .await(function(error, us) {
     if (error) throw error;
-    plotUS(us)
+    renderUS(us)
     renderCities()
   });
