@@ -12,6 +12,10 @@ const svg = d3.select("body")
     .attr("width", width)
     .attr("height", height);
 
+const tooltip = d3.select("body")
+		    .append("div")
+    		.attr("class", "tooltip")
+
 const renderUS = (us) => {
   svg.append("g")
         .attr("class", "states")
@@ -31,27 +35,33 @@ const renderCities = () => {
   stateAbbreviations.forEach(state => getCitiesForState(state))
 }
 
-let count = 0
 const plotCities = (response) => {
-  const cityCoordinates = response.map(cities => Object.values(cities))
   svg.selectAll("circle")
-      .data(
-        cityCoordinates
-      )
+      .data(response)
       .enter()
       .append("circle")
       .attr("cx", d => {
-        count++
-        console.log(count)
-        console.log(projection([d[0].longitude, d[0].latitude])[0])
-        return projection([d[0].longitude, d[0].latitude])[0]
+        return projection([Object.values(d)[0].longitude, Object.values(d)[0].latitude])[0]
       })
       .attr("cy", d => {
-        return projection([d[0].longitude, d[0].latitude])[1]
+        return projection([Object.values(d)[0].longitude, Object.values(d)[0].latitude])[1]
       })
       .attr("r", 4.25)
       .attr("fill", "red")
       .style("opacity", 0.15)
+      .on("mouseover", (d) => {
+        tooltip.transition()
+         .duration(200)
+         .style("opacity", 1);
+        tooltip.text(`${Object.keys(d)[0]}`)
+         .style("left", (d3.event.pageX) + "px")
+         .style("top", (d3.event.pageY) + "px");
+      })
+    .on("mouseout", (d) => {
+        tooltip.transition()
+           .duration(500)
+           .style("opacity", 0);
+});
   return response
 }
 
@@ -61,9 +71,5 @@ d3.queue()
   .await(function(error, us) {
     if (error) throw error;
     renderUS(us)
-    // getCitiesForState('LA')
-    // getCitiesForState('FL')
-    getCitiesForState('GA')
-    getCitiesForState('NY')
-    // renderCities()
+    getCitiesForState('AK')
   });
