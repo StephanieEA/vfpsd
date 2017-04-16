@@ -1,5 +1,5 @@
 const width = 900,
-    height = 600;
+      height = 600;
 
 const projection = d3.geoAlbersUsa()
     .scale(1125)
@@ -13,16 +13,16 @@ const svg = d3.select("body")
     .attr("height", height);
 
 const tooltip = d3.select("body")
-		    .append("div")
-    		.attr("class", "tooltip")
+		.append("div")
+    .attr("class", "tooltip")
 
 const renderUS = (us) => {
   svg.append("g")
-        .attr("class", "states")
-        .selectAll("path")
-        .data(topojson.feature(us, us.objects.states).features)
-        .enter().append("path")
-        .attr("d", path);
+      .attr("class", "states")
+      .selectAll("path")
+      .data(topojson.feature(us, us.objects.states).features)
+      .enter().append("path")
+      .attr("d", path);
 
   svg.insert("path")
       .datum(topojson.mesh(us, us.objects.states, (a, b) => {
@@ -31,19 +31,13 @@ const renderUS = (us) => {
       .attr("d", path);
 }
 
-const renderCities = () => {
-  stateAbbreviations.forEach(state => getCitiesForState(state))
-}
-
-const plotCities = (response) => {
-  svg.selectAll("circle")
+const plotCities = (state, response) => {
+  svg.selectAll(`circle.${state}`)
       .data(response)
       .enter()
       .append("circle")
+      .attr("class", `${state}`)
       .attr("cx", d => {
-        console.log(`name: ${Object.keys(d)[0]},
-          longitude: ${Object.values(d)[0].longitude}
-        `)
         return projection([Object.values(d)[0].longitude, Object.values(d)[0].latitude])[0]
       })
       .attr("cy", d => {
@@ -53,7 +47,7 @@ const plotCities = (response) => {
       .attr("fill", "red")
       .style("opacity", 0.15)
       .on("mouseover", (d) => {
-        console.log(d)
+        console.log(`name: ${Object.keys(d)[0]}, longitude: ${Object.values(d)[0].longitude}`)
         tooltip.transition()
          .duration(200)
          .style("opacity", 1);
@@ -61,26 +55,17 @@ const plotCities = (response) => {
          .style("left", (d3.event.pageX) + "px")
          .style("top", (d3.event.pageY) + "px");
       })
-    .on("mouseout", (d) => {
-        tooltip.transition()
-           .duration(500)
-           .style("opacity", 0);
-});
-  return response
+      .on("mouseout", (d) => {
+          tooltip.transition()
+             .duration(500)
+             .style("opacity", 0);
+      });
 }
-
 
 d3.queue()
   .defer(d3.json, "http://bl.ocks.org/mbostock/raw/4090846/us.json")
   .await((error, us) => {
     if (error) throw error;
     renderUS(us)
-    getCitiesForState('VT')
-      .then(vt => {
-        plotCities(vt)
-      })
-    getCitiesForState('AK')
-      .then(ak => {
-        plotCities(ak)
-      })
+    renderCities(stateAbbreviations)
 })

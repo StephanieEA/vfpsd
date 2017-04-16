@@ -1,13 +1,15 @@
-const getCitiesForState = (state) => {
-  return fetch(`http://localhost:3000/api/v1/state-territory/${state}/incidents`)
+const renderCities = (states) => {
+  return states.forEach(state => {
+    return fetch(`http://localhost:3000/api/v1/state-territory/${state}/incidents`)
     .then(response => response.json())
     .then(response => response.map(incident => incident.city))
     .then(incidentCities => getCoordinatesForCities(state, incidentCities))
     .then(response => {
-      // plotCities(response)
+      plotCities(state, response)
       return response
     })
-  .catch(error => console.log(error))
+    .catch(error => console.log(error))
+  })
 }
 
 const getCoordinatesForCities = (state, incidentCities) => {
