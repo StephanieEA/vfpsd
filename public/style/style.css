@@ -13,11 +13,10 @@ body {
 
 div.tooltip {
  	position: absolute;
-	text-align: left;
-	height: 200px;
-  width: 100px;
-	padding: 5px;
+	text-align: center;
+	padding: 0px 10px;
 	font-family: sans-serif;
 	background: white;
+  border-radius: 5px;
 	pointer-events: none;
 }

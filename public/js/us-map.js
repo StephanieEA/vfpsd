@@ -43,15 +43,15 @@ const plotCities = (state, response) => {
       .attr("cy", d => {
         return projection([Object.values(d)[0].longitude, Object.values(d)[0].latitude])[1]
       })
-      .attr("r", 4.25)
+      .attr("r", 3)
       .attr("fill", "red")
       .style("opacity", 0.15)
       .on("mouseover", (d) => {
-        console.log(`name: ${Object.keys(d)[0]}, longitude: ${Object.values(d)[0].longitude}`)
         tooltip.transition()
          .duration(200)
          .style("opacity", 1);
-        tooltip.text(`${Object.keys(d)[0]}`)
+        tooltip.html(`<p class="tooltip city">${Object.keys(d)[0]}<p/>
+                    ${Object.values(d)[0].count}`)
          .style("left", (d3.event.pageX) + "px")
          .style("top", (d3.event.pageY) + "px");
       })

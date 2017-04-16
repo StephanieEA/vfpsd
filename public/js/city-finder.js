@@ -2,25 +2,23 @@ const renderCities = (states) => {
   return states.forEach(state => {
     return fetch(`http://localhost:3000/api/v1/state-territory/${state}/incidents`)
     .then(response => response.json())
-    .then(response => response.map(incident => incident.city))
-    .then(incidentCities => getCoordinatesForCities(state, incidentCities))
-    .then(response => {
-      plotCities(state, response)
-      return response
-    })
+    .then(response => countCityIncidents(response))
+    .then(incidentCities => assignCoordinatesForCities(state, incidentCities))
+    .then(response => plotCities(state, response))
     .catch(error => console.log(error))
   })
 }
 
-const getCoordinatesForCities = (state, incidentCities) => {
+const assignCoordinatesForCities = (state, incidentCities) => {
   return fetch(`http://api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
     .then(response => response.json())
     .then(response => {
       return response.map(cities => {
-        if (incidentCities.indexOf(cities.name) !== -1) {
+        if (incidentCities[cities.name]) {
           return Object.assign({}, { [cities.name] : {
             latitude: cities.primary_latitude,
-            longitude: cities.primary_longitude
+            longitude: cities.primary_longitude,
+            count: incidentCities[cities.name]
             }
           })
         } else {
