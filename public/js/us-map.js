@@ -40,17 +40,20 @@ const renderUS = (error, us, statePopulations) => {
         if (statePopulations.find(state => state.state === d.properties.name)) {
           const indentifiedState = statePopulations.find(state => state.state === d.properties.name)
           const population = Number(indentifiedState.population.replace(/,/g,''))
-
-          return color(d.rate =
-            fetch(`http://localhost:3000/api/v1/state-territory/${nameToAbbreviation(d.properties.name)}/incidents`)
-              .then(response => response.json())
-              .then(response => {
-                  console.log(
-                    (response.length*1000000)/population
-                  )
-                return response.length*1000000/population
-              })
-          )
+          // console.log(Math.random() * 3 + 1)
+          return color(d.rate =         Math.random() * 3 + 1) 
+            //returns what I want
+            // fetch(`http://localhost:3000/api/v1/state-territory/${nameToAbbreviation(d.properties.name)}/incidents`)
+            //   .then(response => response.json())
+            //   .then(response => {
+            //     let filtered = response.filter(response => response.date.includes('2017-'))
+            //     return (filtered.length*1000000)/population
+            //   })
+            //   .then(response => {
+            //     console.log(response)
+            //     return parseFloat(response)
+            //   })
+          // )
         }
       })
 
