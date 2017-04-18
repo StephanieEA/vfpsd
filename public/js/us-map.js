@@ -18,36 +18,44 @@ const tooltip = d3.select("body")
 
 // Define scale for output
 var x = d3.scaleLinear()
-    .domain([1, 10])
+    .domain([1, 3])
     .rangeRound([600, 860]);
 
 var color = d3.scaleThreshold()
-        .domain(d3.range(2, 10))
-        .range(d3.schemeBlues[9]);
+        .domain(d3.range(2, 5))
+        .range(d3.schemeGreys[3]);
 
 var g = svg.append("g")
     .attr("class", "key")
-    .attr("transform", "translate(0,40)");
+    .attr("transform", "translate(0,50)");
 
 const renderUS = (error, us, statePopulations) => {
-  console.log(us.objects.states.geometries.map(states => states.properties.name))
-
   svg.append("g")
       .attr("class", "states")
       .selectAll("path")
-      .data(topojson.feature(us, us.objects.states.geometries))
-      // .data(us.features)
-      // .data(topojson.feature(us, us.geometry.coordinates).features)
+      .data(topojson.feature(us, us.objects.states).features)
       .enter().append("path")
+      .attr("d", path)
       .attr("fill", (d) => {
-        console.log(d)
-        console.log(statePopulations)
-        console.log(statePopulations.find(state => state.state === d.id))
-        color(d.rate = statePopulations)})
-      .attr("d", path);
+        if (statePopulations.find(state => state.state === d.properties.name)) {
+          const indentifiedState = statePopulations.find(state => state.state === d.properties.name)
+          const population = Number(indentifiedState.population.replace(/,/g,''))
+
+          return color(d.rate =
+            fetch(`http://localhost:3000/api/v1/state-territory/${nameToAbbreviation(d.properties.name)}/incidents`)
+              .then(response => response.json())
+              .then(response => {
+                  console.log(
+                    (response.length*1000000)/population
+                  )
+                return response.length*1000000/population
+              })
+          )
+        }
+      })
 
   svg.insert("path")
-      .datum(topojson.mesh(us, us.objects.states.geometries, (a, b) => {
+      .datum(topojson.mesh(us, us.objects.states, (a, b) => {
         return a !== b; }))
       .attr("class", "state-boundary")
       .attr("d", path);
@@ -64,6 +72,22 @@ const renderUS = (error, us, statePopulations) => {
       .attr("x", function(d) { return x(d[0]); })
       .attr("width", function(d) { return x(d[1]) - x(d[0]); })
       .attr("fill", function(d) { return color(d[0]); });
+
+  g.append("text")
+      .attr("class", "caption")
+      .attr("x", x.range()[0])
+      .attr("y", -7)
+      .attr("fill", "#000")
+      .attr("text-anchor", "start")
+      .attr("font-weight", "bold")
+      .text("Shootings per million people");
+
+  g.call(d3.axisBottom(x)
+      .tickSize(10)
+      .tickFormat(function(x, i) { return i ? x : x + "%"; })
+      .tickValues(color.domain()))
+    .select(".domain")
+      .remove();
 
   renderCities(stateAbbreviations)
 }
@@ -82,7 +106,7 @@ const plotCities = (state, response) => {
       })
       .attr("r", 3)
       .attr("fill", "red")
-      .style("opacity", 0.15)
+      .style("opacity", 0.25)
       .on("mouseover", (d) => {
         tooltip.transition()
          .duration(200)
@@ -101,7 +125,5 @@ const plotCities = (state, response) => {
 
 d3.queue()
   .defer(d3.json, "/data/us.json")
-  // .defer(d3.json, "https://bl.ocks.org/mbostock/raw/2206489/7110de3d8412433d3222c9b7e3ac6593593162b2/us-states.json")
-  // .defer(d3.json, "http://bl.ocks.org/mbostock/raw/4090846/us.json")
   .defer(d3.csv, "/data/state-poplulation-data.csv")
   .await(renderUS)
