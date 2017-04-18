@@ -27,8 +27,23 @@ app.set('port', process.env.PORT || 3000)
 
 app.locals.title = 'Fatal Police Shootings'
 
+//get homepage
 app.get('/', (request, response) => {
   fs.readFile(`${__dirname}/index.html`, (err, file) => {
+    response.send(file)
+  })
+})
+
+// get state population data
+app.get('/data/state-poplulation-data.csv', (request, response) => {
+  fs.readFile(`${__dirname}/data/state-populations.csv`, (err, file) => {
+    response.send(file)
+  })
+})
+
+// // get topojson state data
+app.get('/data/us.json', (request, response) => {
+  fs.readFile(`${__dirname}/data/us.json`, (err, file) => {
     response.send(file)
   })
 })

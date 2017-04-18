@@ -5,7 +5,7 @@ const stateAbbreviations = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE",
 "WV", "WI", "WY"]
 
 const countCityIncidents = (response) => {
-  return response.reduce((object, value, index) => {
+  return response.reduce((object, value) => {
     if (!object[value.city]) {
       object[value.city] = 1
     } else {
