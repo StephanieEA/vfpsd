@@ -16,20 +16,19 @@ const tooltip = d3.select("body")
 		.append("div")
     .attr("class", "tooltip")
 
-// Define scale for output
 var x = d3.scaleLinear()
-    .domain([1, 3])
-    .rangeRound([600, 860]);
+    .domain([0, 10])
+    .rangeRound([600, 900]);
 
 var color = d3.scaleThreshold()
-        .domain(d3.range(2, 5))
-        .range(d3.schemeGreys[3]);
+        .domain(d3.range(1, 10))
+        .range(d3.schemeGreys[9]);
 
 var g = svg.append("g")
     .attr("class", "key")
-    .attr("transform", "translate(0,50)");
+    .attr("transform", "translate(-575,575)");
 
-const renderUS = (error, us, statePopulations) => {
+const renderUS = (error, us, stateStats) => {
   svg.append("g")
       .attr("class", "states")
       .selectAll("path")
@@ -37,23 +36,9 @@ const renderUS = (error, us, statePopulations) => {
       .enter().append("path")
       .attr("d", path)
       .attr("fill", (d) => {
-        if (statePopulations.find(state => state.state === d.properties.name)) {
-          const indentifiedState = statePopulations.find(state => state.state === d.properties.name)
-          const population = Number(indentifiedState.population.replace(/,/g,''))
-          // console.log(Math.random() * 3 + 1)
-          return color(d.rate =         Math.random() * 3 + 1) 
-            //returns what I want
-            // fetch(`http://localhost:3000/api/v1/state-territory/${nameToAbbreviation(d.properties.name)}/incidents`)
-            //   .then(response => response.json())
-            //   .then(response => {
-            //     let filtered = response.filter(response => response.date.includes('2017-'))
-            //     return (filtered.length*1000000)/population
-            //   })
-            //   .then(response => {
-            //     console.log(response)
-            //     return parseFloat(response)
-            //   })
-          // )
+        if (stateStats.find(state => state.state === d.properties.name)) {
+          const identifiedState = stateStats.find(state => state.state === d.properties.name)
+          return color(d.rate = identifiedState.perYear)
         }
       })
 
@@ -63,6 +48,11 @@ const renderUS = (error, us, statePopulations) => {
       .attr("class", "state-boundary")
       .attr("d", path);
 
+  renderCities(stateAbbreviations)
+  renderKey()
+}
+
+const renderKey = () => {
   g.selectAll("rect")
     .data(color.range().map(function(d) {
         d = color.invertExtent(d);
@@ -83,7 +73,9 @@ const renderUS = (error, us, statePopulations) => {
       .attr("fill", "#000")
       .attr("text-anchor", "start")
       .attr("font-weight", "bold")
-      .text("Shootings per million people");
+      .attr("letter-spacing", "1")
+      .attr("transform", "translate(0, -7)")
+      .text("Shootings per million per year");
 
   g.call(d3.axisBottom(x)
       .tickSize(10)
@@ -91,8 +83,6 @@ const renderUS = (error, us, statePopulations) => {
       .tickValues(color.domain()))
     .select(".domain")
       .remove();
-
-  renderCities(stateAbbreviations)
 }
 
 const plotCities = (state, response) => {
@@ -109,7 +99,7 @@ const plotCities = (state, response) => {
       })
       .attr("r", 3)
       .attr("fill", "red")
-      .style("opacity", 0.25)
+      .style("opacity", 0.40)
       .on("mouseover", (d) => {
         tooltip.transition()
          .duration(200)

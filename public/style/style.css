@@ -1,5 +1,10 @@
 body {
   text-align: center;
+  font-family: arial, sans-serif;
+}
+
+svg {
+  margin-top: 20px;
 }
 
 .state-boundary {
