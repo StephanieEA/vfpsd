@@ -3,13 +3,13 @@ const renderCities = (states) => {
     return fetch(`http://localhost:3000/api/v1/state-territory/${state}/incidents`)
     .then(response => response.json())
     .then(response => countCityIncidents(response))
-    .then(incidentCities => assignCoordinatesForCities(state, incidentCities))
+    .then(incidentCities => assignCityData(state, incidentCities))
     .then(response => plotCities(state, response))
     .catch(error => console.log(error))
   })
 }
 
-const assignCoordinatesForCities = (state, incidentCities) => {
+const assignCityData = (state, incidentCities) => {
   return fetch(`http://api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
     .then(response => response.json())
     .then(response => {
