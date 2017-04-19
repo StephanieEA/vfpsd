@@ -72,7 +72,7 @@ const renderKey = () => {
       .attr("y", -10)
       .attr("fill", "#000")
       .attr("text-anchor", "start")
-      .text("Shootings per million per year");
+      .text("Shootings per million people, per year");
 
   g.call(d3.axisBottom(x)
       .tickSize(10)
