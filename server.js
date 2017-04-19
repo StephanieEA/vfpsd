@@ -4,6 +4,7 @@ const cors = require('cors')
 const fs = require('fs')
 const path = require('path')
 const app = express()
+const axios = require('axios')
 
 const environment = process.env.NODE_ENV || 'development'
 const configuration = require('./knexfile')[environment]
@@ -52,6 +53,14 @@ app.get('/data/fatal-police-shootings-data.csv', (request, response) => {
   fs.readFile(`${__dirname}/data/fatal-police-shootings-data.csv`, (err, file) => {
     response.send(file)
   })
+})
+
+app.get('/data/external/:state', (request, response) => {
+  const { state } = request.params
+   axios(`http://api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
+    .then(data => {
+      response.send(data)
+    })
 })
 
 // get all data
