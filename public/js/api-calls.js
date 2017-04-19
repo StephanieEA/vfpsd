@@ -10,7 +10,7 @@ const renderCities = (states) => {
 }
 
 const assignCityData = (state, incidentCities) => {
-  return fetch(`//api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
+  return fetch(`http://api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
     .then(response => response.json())
     .then(response => {
       return response.map(cities => {
