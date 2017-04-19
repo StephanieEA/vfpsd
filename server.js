@@ -48,6 +48,12 @@ app.get('/data/us.json', (request, response) => {
   })
 })
 
+app.get('/data/fatal-police-shootings-data.csv', (request, response) => {
+  fs.readFile(`${__dirname}/data/fatal-police-shootings-data.csv`, (err, file) => {
+    response.send(file)
+  })
+})
+
 // get all data
 app.get('/api/v1/all', (request, response) => {
   const year = request.query.year
