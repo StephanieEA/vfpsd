@@ -7,7 +7,7 @@
 [Link to original data source](https://github.com/washingtonpost/data-police-shootings)
 
 ## Overview
-Thus far, this is a simple restful API which largely conforms to the JSON API standard. The server is built on node-express, and connects to a postgres db via knex. Endpoints are tested using Mocha Chai.  There are two tables, one for all of the data provided from the Washington post and one for states.  All endpoints respond with appropriate status codes and JSON.  For this version, the api does not use pagination or contain data as a top level header, which the standard calls for.  It is so limited in its scope at this time, that it isn't time-effective to meet these requirements.
+Thus far, this is a simple visualization of data and a restful API which largely conforms to the JSON API standard. The server is built on node-express, and connects to a postgres db via knex. Endpoints are tested using Mocha Chai.  There are two tables, one for all of the data provided from the Washington post and one for states.  All endpoints respond with appropriate status codes and JSON.  For this version, the api does not use pagination or contain data as a top level header, which the standard calls for.  It is so limited in its scope at this time, that it isn't time-effective to meet these requirements.
 
 ## Endpoints
 [heroku](https://fatal-police-shootings.herokuapp.com/)
