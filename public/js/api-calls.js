@@ -1,6 +1,6 @@
 const renderCities = (states) => {
   return states.forEach(state => {
-    return fetch(`http://localhost:3000/api/v1/state-territory/${state}/incidents`)
+    return fetch(`/api/v1/state-territory/${state}/incidents`)
     .then(response => response.json())
     .then(response => countCityIncidents(response))
     .then(incidentCities => assignCityData(state, incidentCities))
