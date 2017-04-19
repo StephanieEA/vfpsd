@@ -5,6 +5,9 @@ const fs = require('fs')
 const path = require('path')
 const app = express()
 const axios = require('axios')
+const util = require('util')
+var fetch = require('node-fetch');
+
 
 const environment = process.env.NODE_ENV || 'development'
 const configuration = require('./knexfile')[environment]
@@ -57,10 +60,14 @@ app.get('/data/fatal-police-shootings-data.csv', (request, response) => {
 
 app.get('/data/external/:state', (request, response) => {
   const { state } = request.params
-   axios(`http://api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
+   fetch(`http://api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
     .then(data => {
-      response.send(data)
+      return data.json()
     })
+    .then(data => {
+      response.send(data);
+    })
+    .catch(error => console.log(error))
 })
 
 // get all data
