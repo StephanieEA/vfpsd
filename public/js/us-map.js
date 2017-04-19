@@ -69,20 +69,17 @@ const renderKey = () => {
   g.append("text")
       .attr("class", "caption")
       .attr("x", x.range()[0])
-      .attr("y", -7)
+      .attr("y", -10)
       .attr("fill", "#000")
       .attr("text-anchor", "start")
-      .attr("font-weight", "bold")
-      .attr("letter-spacing", "1")
-      .attr("transform", "translate(0, -7)")
       .text("Shootings per million per year");
 
   g.call(d3.axisBottom(x)
       .tickSize(10)
       .tickFormat(function(x, i) { return i ? x : x + "%"; })
       .tickValues(color.domain()))
-    .select(".domain")
-      .remove();
+        .select(".domain")
+        .remove();
 }
 
 const plotCities = (state, response) => {
@@ -104,8 +101,8 @@ const plotCities = (state, response) => {
         tooltip.transition()
          .duration(200)
          .style("opacity", 1);
-        tooltip.html(`<p class="tooltip city">${Object.keys(d)[0]}<p/>
-                    ${Object.values(d)[0].count}`)
+            tooltip.html(`<p class="tooltip city">${Object.keys(d)[0]}<p/>
+                ${Object.values(d)[0].count}`)
          .style("left", (d3.event.pageX) + "px")
          .style("top", (d3.event.pageY) + "px");
       })
