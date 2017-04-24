@@ -66,27 +66,13 @@ describe('API Routes', function() {
       }
     ]
 
-    const states_and_territories = [
-      {
-        name: 'Kansas',
-        abbreviation: 'KS',
-      },
-      {
-        name: 'Washington',
-        abbreviation: 'WA',
-      },
-      {
-        name: 'Vermont',
-        abbreviation: 'VT',
-      }
-    ]
+
 
     knex.migrate.rollback()
     .then(function() {
       knex.migrate.latest()
       .then(function() {
         knex('fatal_police_shootings_data').insert(fatal_police_shootings_data)
-        .then(_ => knex('states_and_territories').insert(states_and_territories))
         .then(function() {
           done();
         })
@@ -220,62 +206,6 @@ describe('API Routes', function() {
       })
     })
   })
-
-  describe('GET /api/v1/state-territory', function() {
-    it('should return a response 200 and all states and territories', function(done){
-    chai.request(app)
-      .get('/api/v1/state-territory')
-      .end(function (err, res) {
-        res.should.have.status(200);
-        res.should.be.json;
-        res.body.should.be.a('array');
-        res.body.length.should.equal(3);
-        res.body[0].should.have.property('name');
-        res.body[0].should.have.property('id');
-        res.body[0].should.have.property('abbreviation');
-        done()
-      })
-    })
-  })
-
-  describe('GET /api/v1/state-territory/:id', function() {
-    it('should return a response 200 and a specific states or territory for a state/territory that exists', function(done){
-    chai.request(app)
-      .get('/api/v1/state-territory/1')
-      .end(function (err, res) {
-        res.should.have.status(200);
-        res.should.be.json;
-        res.body.should.be.a('array');
-        res.body.length.should.equal(1);
-        res.body[0].name.should.equal('Kansas');
-        res.body[0].id.should.equal(1);
-        res.body[0].abbreviation.should.equal('KS');
-        done()
-      })
-    })
-
-    it('should return  a response 404 and the appropriate message for a nonexisting id', function(done){
-    chai.request(app)
-      .get('/api/v1/state-territory/8999')
-      .end(function (err, res) {
-        res.should.have.status(404);
-        res.should.be.json;
-        res.body.should.have.property('error')
-        res.body.error.should.equal('no state for that id');
-        done()
-      })
-    })
-
-    it('should return response 500, somethings wrong with db when the request param isn\'t an integer type', function(done){
-    chai.request(app)
-      .get('/api/v1/state-territory/asdfa')
-      .end(function (err, res) {
-        res.should.have.status(500);
-        done()
-      })
-    })
-  })
-
 
   describe('GET /api/v1/state-territory/:abbreviation/incidents', function() {
     it('should return a response 200 and all incidents that occured in a specific state if they exist', function(done){
@@ -470,50 +400,6 @@ describe('API Routes', function() {
     })
   })
 
-describe('POST /api/v1/state-territory', function() {
-  it('should return a response 200 and all states belonging to the specifed folder, including the added state', function(done){
-  chai.request(app)
-    .post(`/api/v1/state-territory`)
-    .send({name: 'Florida', abbreviation: 'FL'})
-    .end(function (err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('array');
-      res.body[3].should.have.property('id');
-      res.body[3].should.have.property('name');
-      res.body[3].should.have.property('abbreviation');
-      res.body[3].id.should.equal(4);
-      res.body[3].name.should.equal('Florida');
-      res.body[3].abbreviation.should.equal('FL');
-      done()
-    })
-  })
-
-  it('should return a status 422 and error message of all properties are not provided if all properties aren\'t provided', function(done){
-  chai.request(app)
-    .post(`/api/v1/state-territory`)
-    .send({name: 'Florida'})
-    .end(function (err, res) {
-      res.should.have.status(422)
-      res.body.should.have.property('error')
-      res.body.error.should.equal('All properties are not provided')
-      done()
-    })
-  })
-
-  it('should return a status 422 and error message of incorrect format if the request body includes values other than name and abbreviation', function(done){
-  chai.request(app)
-    .post(`/api/v1/state-territory`)
-    .send({name: 'Alaska', abbreviation: 'AK', moose: 'for dayzz'})
-    .end(function (err, res) {
-      res.should.have.status(422)
-      res.body.should.have.property('error')
-      res.body.error.should.equal('incorrect format')
-      done()
-    })
-  })
-})
-
 describe('PATCH /api/v1/all/:id', function() {
   it('should return a response 200 and the updated incident for proper ids', function(done){
   chai.request(app)
@@ -574,42 +460,6 @@ describe('PATCH /api/v1/all/:id', function() {
   })
 })
 
-describe('PATCH /api/v1/state-territory/:id', function() {
-  it('should return a response 200 and the updated incident for proper ids', function(done){
-  chai.request(app)
-    .patch('/api/v1/state-territory/1')
-    .send({
-            name: 'Narnia',
-            abbreviation: 'NA'
-          })
-    .end(function (err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('array');
-      res.body.length.should.equal(1);
-      res.body[0].name.should.equal('Narnia');
-      res.body[0].abbreviation.should.equal('NA');
-      done()
-    })
-  })
-
-  it('should return a response 404 and the appropriate error message for nonexisting ids', function(done){
-  chai.request(app)
-    .patch('/api/v1/state-territory/55')
-    .send({
-            name: 'Middle Earth',
-            abbreviation: 'MEE'
-          })
-    .end(function (err, res) {
-      res.should.have.status(404);
-      res.should.be.json;
-      res.body.should.have.property('error')
-      res.body.error.should.equal('no states or territories for this id');
-      done()
-    })
-  })
-})
-
 describe('DELETE /api/v1/all/:id', function() {
   it('should return a response 200 and delete a specific incident', function(done){
   chai.request(app)
@@ -629,30 +479,6 @@ describe('DELETE /api/v1/all/:id', function() {
       res.should.have.status(404);
       res.should.be.json;
       res.body.should.have.property('error')
-      res.body.error.should.equal('id not found');
-      done()
-    })
-  })
-})
-
-describe('DELETE /api/v1/state-territory/:id', function() {
-  it('should respond with a 200 status and delete a specific state or territory', function(done){
-  chai.request(app)
-    .delete('/api/v1/state-territory/1')
-    .end(function (err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.message.should.equal('incident for id 1 deleted')
-      done()
-    })
-  })
-
-  it('should respond with a 404, message of id not found, if the state does not exist', function(done){
-  chai.request(app)
-    .delete('/api/v1/state-territory/999')
-    .end(function (err, res) {
-      res.should.have.status(404);
-      res.should.be.json;
       res.body.error.should.equal('id not found');
       done()
     })
