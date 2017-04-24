@@ -16,15 +16,15 @@ const tooltip = d3.select("body")
 		.append("div")
     .attr("class", "tooltip")
 
-var x = d3.scaleLinear()
+const x = d3.scaleLinear()
     .domain([0, 10])
     .rangeRound([600, 900]);
 
-var color = d3.scaleThreshold()
-        .domain(d3.range(1, 10))
-        .range(d3.schemeGreys[9]);
+const color = d3.scaleThreshold()
+    .domain(d3.range(1, 10))
+    .range(d3.schemeGreys[9]);
 
-var g = svg.append("g")
+const g = svg.append("g")
     .attr("class", "key")
     .attr("transform", "translate(-575,575)");
 
@@ -54,7 +54,7 @@ const renderUS = (error, us, stateStats) => {
 
 const renderKey = () => {
   g.selectAll("rect")
-    .data(color.range().map(function(d) {
+    .data(color.range().map((d) => {
         d = color.invertExtent(d);
         if (d[0] == null) d[0] = x.domain()[0];
         if (d[1] == null) d[1] = x.domain()[1];
@@ -62,9 +62,9 @@ const renderKey = () => {
       }))
     .enter().append("rect")
       .attr("height", 8)
-      .attr("x", function(d) { return x(d[0]); })
-      .attr("width", function(d) { return x(d[1]) - x(d[0]); })
-      .attr("fill", function(d) { return color(d[0]); });
+      .attr("x", (d) => x(d[0]))
+      .attr("width",(d) => x(d[1]) - x(d[0]))
+      .attr("fill", (d) => color(d[0]));
 
   g.append("text")
       .attr("class", "caption")
@@ -76,7 +76,7 @@ const renderKey = () => {
 
   g.call(d3.axisBottom(x)
       .tickSize(10)
-      .tickFormat(function(x, i) { return i ? x : x + "%"; })
+      .tickFormat((x, i) => i ? x : x + "%")
       .tickValues(color.domain()))
         .select(".domain")
         .remove();
