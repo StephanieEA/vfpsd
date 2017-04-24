@@ -41,6 +41,7 @@ const renderUS = (error, us, stateStats) => {
           return color(d.rate = identifiedState.perYear)
         }
       })
+      .on("click", clickState)
 
   svg.insert("path")
       .datum(topojson.mesh(us, us.objects.states, (a, b) => {
@@ -111,6 +112,10 @@ const plotCities = (state, response) => {
              .duration(500)
              .style("opacity", 0);
       });
+}
+
+const clickState = (d) => {
+  console.log(d.properties)
 }
 
 d3.queue()

@@ -15,7 +15,7 @@ const assignCityData = (state, incidentCities) => {
       return response.json()
     })
     .then(response => {
-      console.log(response);
+      // console.log(response);
       return response.map(cities => {
         if (incidentCities[cities.name]) {
           return Object.assign({}, { [cities.name] : {
