@@ -3,10 +3,8 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const fs = require('fs')
 const path = require('path')
+const fetch = require('node-fetch');
 const app = express()
-const axios = require('axios')
-const util = require('util')
-var fetch = require('node-fetch');
 
 
 const environment = process.env.NODE_ENV || 'development'
@@ -14,11 +12,11 @@ const configuration = require('./knexfile')[environment]
 const database = require('knex')(configuration)
 
 
-const countValues = require('./helpers/helpers.js').countValues
-const ratio = require('./helpers/helpers.js').ratio
+const countValues = require('./server-helpers/server-helpers.js').countValues
+const ratio = require('./server-helpers/server-helpers.js').ratio
 
 app.use(cors())
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next()
@@ -31,21 +29,18 @@ app.set('port', process.env.PORT || 3000)
 
 app.locals.title = 'Fatal Police Shootings'
 
-//get homepage
 app.get('/', (request, response) => {
   fs.readFile(`${__dirname}/index.html`, (err, file) => {
     response.send(file)
   })
 })
 
-// get state population data
 app.get('/data/state-poplulation-data.csv', (request, response) => {
   fs.readFile(`${__dirname}/data/state-populations.csv`, (err, file) => {
     response.send(file)
   })
 })
 
-// // get topojson state data
 app.get('/data/us.json', (request, response) => {
   fs.readFile(`${__dirname}/data/us.json`, (err, file) => {
     response.send(file)
@@ -90,9 +85,8 @@ app.get('/api/v1/all', (request, response) => {
         response.status(200).send(fatal_police_shootings_data)
       }
     })
-    .catch(function(error) {
-      response.sendStatus(500)
-      console.error('somethings wrong with db')
+    .catch((error) => {
+      response.status(500).send({error: 'somethings wrong with db'})
   });
 })
 
@@ -111,17 +105,6 @@ app.get('/api/v1/all/:id', (request, response) => {
     .catch((error) => {
       response.status(500).send({error: 'server error'})
     })
-})
-
-// get all states
-app.get('/api/v1/state-territory', (request, response) => {
-  database('states_and_territories').select()
-    .then((states_and_territories) => {
-      response.status(200).send(states_and_territories)
-    })
-    .catch((error) => {
-      response.status(500).send({error: 'somethings wrong with db'})
-  })
 })
 
 // get a specific state by its id
@@ -247,32 +230,6 @@ app.post('/api/v1/all', (request, response) => {
   }
 })
 
-// post a new state
-app.post('/api/v1/state-territory', (request, response) => {
-  if (Object.keys(request.body).length > 2) {
-    response.status(422).send({error: 'incorrect format'})
-  } else {
-    const { name, abbreviation } = request.body
-
-    if (!name || !abbreviation) {
-     response.status(422).send({error: 'All properties are not provided'})
-    } else {
-      const state = { name, abbreviation }
-
-      database('states_and_territories').insert(state)
-        .then(() => {
-          database('states_and_territories').select()
-          .then((states_and_territories) => {
-            response.status(200).send(states_and_territories)
-          })
-        })
-        .catch((error) => {
-          response.status(500).send({error: 'something\'s wrong with db'})
-        })
-    }
-  }
-})
-
 // update information for an incident
 app.patch('/api/v1/all/:id', (request, response) => {
   const updates = request.body
@@ -285,26 +242,6 @@ app.patch('/api/v1/all/:id', (request, response) => {
           response.status(404).send({error: 'no incidents for this id'})
         } else {
           response.status(200).send(fatal_police_shootings_data)
-        }
-      })
-    })
-    .catch((error) => {
-      response.status(500).send({error: 'something\'s wrong with db'})
-    })
-})
-
-// update information for a state
-app.patch('/api/v1/state-territory/:id', (request, response) => {
-  const updates = request.body
-  const { id } = request.params
-  database('states_and_territories').where('id', id).select().update(updates)
-    .then(() => {
-      database('states_and_territories').where('id', id).select()
-      .then((states_and_territories) => {
-        if (states_and_territories.length === 0){
-          response.status(404).send({error: 'no states or territories for this id'})
-        } else {
-          response.status(200).send(states_and_territories)
         }
       })
     })
@@ -329,21 +266,6 @@ app.delete('/api/v1/all/:id', (request, response) => {
       })
 })
 
-// delete a state/territory
-app.delete('/api/v1/state-territory/:id', (request, response) => {
-  const { id } = request.params
-  database('states_and_territories').where('id', id).del()
-    .then((states_and_territories) => {
-      if(states_and_territories === 0) {
-        response.status(404).send({error: 'id not found'})
-      } else {
-        response.status(200).send({message: `incident for id ${id} deleted`})
-      }
-    })
-    .catch((error) => {
-      response.status(500).send({error: 'server error'})
-    })
-})
 
 app.listen(app.get('port'), () => {
   console.log(`${app.locals.title} is running on ${app.get('port')}.`)
