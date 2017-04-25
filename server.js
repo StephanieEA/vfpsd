@@ -121,7 +121,7 @@ app.get('/api/v1/state-territory/:abbreviation/incidents', (request, response) =
    })
 })
 
-app.get('/api/v1/state-territory/:abbreviation/incidents/mental-illness', (request, response) => {
+app.get('/api/v1/state-territory/:abbreviation/mental-illness', (request, response) => {
   const { abbreviation } = request.params
  database('fatal_police_shootings_data').where('state', abbreviation)
    .then((fatal_police_shootings_data) => {
@@ -131,6 +131,63 @@ app.get('/api/v1/state-territory/:abbreviation/incidents/mental-illness', (reque
        const mIValues = fatal_police_shootings_data.map(incident => incident.signs_of_mental_illness)
        const denominator = mIValues.length
        const count = countValues(mIValues)
+       const ratios = ratio(count, denominator)
+       response.status(200).send({ratios: ratios})
+     }
+   })
+   .catch((error) => {
+     response.status(500).send({error: 'somethings wrong with db'})
+   })
+})
+
+app.get('/api/v1/state-territory/:abbreviation/body-camera', (request, response) => {
+  const { abbreviation } = request.params
+ database('fatal_police_shootings_data').where('state', abbreviation)
+   .then((fatal_police_shootings_data) => {
+     if (fatal_police_shootings_data.length === 0) {
+       response.status(404).send({error: 'no incidents found for the place you entered'})
+     } else {
+       const footageValues = fatal_police_shootings_data.map(incident => incident.body_camera)
+       const denominator = footageValues.length
+       const count = countValues(footageValues)
+       const ratios = ratio(count, denominator)
+       response.status(200).send({ratios: ratios})
+     }
+   })
+   .catch((error) => {
+     response.status(500).send({error: 'somethings wrong with db'})
+   })
+})
+
+app.get('/api/v1/state-territory/:abbreviation/armed', (request, response) => {
+  const { abbreviation } = request.params
+ database('fatal_police_shootings_data').where('state', abbreviation)
+   .then((fatal_police_shootings_data) => {
+     if (fatal_police_shootings_data.length === 0) {
+       response.status(404).send({error: 'no incidents found for the place you entered'})
+     } else {
+       const armedValues = fatal_police_shootings_data.map(incident => incident.armed)
+       const denominator = armedValues.length
+       const count = countValues(armedValues)
+       const ratios = ratio(count, denominator)
+       response.status(200).send({ratios: ratios})
+     }
+   })
+   .catch((error) => {
+     response.status(500).send({error: 'somethings wrong with db'})
+   })
+})
+
+app.get('/api/v1/state-territory/:abbreviation/race', (request, response) => {
+  const { abbreviation } = request.params
+ database('fatal_police_shootings_data').where('state', abbreviation)
+   .then((fatal_police_shootings_data) => {
+     if (fatal_police_shootings_data.length === 0) {
+       response.status(404).send({error: 'no incidents found for the place you entered'})
+     } else {
+       const raceValues = fatal_police_shootings_data.map(incident => incident.race)
+       const denominator = raceValues.length
+       const count = countValues(raceValues)
        const ratios = ratio(count, denominator)
        response.status(200).send({ratios: ratios})
      }
