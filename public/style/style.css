@@ -17,6 +17,10 @@ span {
   padding-top: 5px;
 }
 
+svg > circle {
+  opacity: .40;
+}
+
 .state-boundary {
   fill: none;
   stroke: #fff;
@@ -40,4 +44,8 @@ div.tooltip {
   font-size: 14px;
   font-weight: 300;
   transform: translate(0, -7);
+}
+
+.opaque {
+  opacity: .10;
 }

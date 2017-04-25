@@ -15,7 +15,6 @@ const assignCityData = (state, incidentCities) => {
       return response.json()
     })
     .then(response => {
-      // console.log(response);
       return response.map(cities => {
         if (incidentCities[cities.name]) {
           return Object.assign({}, { [cities.name] : {
@@ -31,4 +30,15 @@ const assignCityData = (state, incidentCities) => {
     })
     .then(cities => cities.filter(city => city !== false))
     .catch(error => console.log(error))
+}
+
+const fetchStateStats = (state) => {
+  return fetch(`/api/v1/state-territory/${state}/incidents`)
+  .then(response => response.json())
+  .then(response => {
+    console.log(response)
+    return response
+  })
+  .then(response => renderStateStats(response))
+  .catch(error => console.log(error))
 }

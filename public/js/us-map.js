@@ -56,7 +56,7 @@ const renderUS = (error, us, stateStats) => {
 const renderKey = () => {
   g.selectAll("rect")
     .data(color.range().map((d) => {
-        d = color.invertExtent(d);
+        d = color.invertExtent(d)
         if (d[0] == null) d[0] = x.domain()[0];
         if (d[1] == null) d[1] = x.domain()[1];
         return d;
@@ -74,7 +74,6 @@ const renderKey = () => {
       .attr("fill", "#000")
       .attr("text-anchor", "start")
       .text("Shootings per million people, per year");
-
   g.call(d3.axisBottom(x)
       .tickSize(10)
       .tickFormat((x, i) => i ? x : x + "%")
@@ -96,8 +95,7 @@ const plotCities = (state, response) => {
         return projection([Object.values(d)[0].longitude, Object.values(d)[0].latitude])[1]
       })
       .attr("r", 3)
-      .attr("fill", "red")
-      .style("opacity", 0.40)
+      .attr("fill", "tomato")
       .on("mouseover", (d) => {
         tooltip.transition()
          .duration(200)
@@ -115,7 +113,20 @@ const plotCities = (state, response) => {
 }
 
 const clickState = (d) => {
-  console.log(d.properties)
+  d3.selectAll('circle, rect, text, line, .caption, .states')
+    .attr("class", "opaque")
+
+  fetchStateStats(nameToAbbreviation(d.properties.name))
+}
+
+const renderStateStats = (response) => {
+  g.append("text")
+  .attr("class", "chart")
+  .attr("x", 1200)
+  .attr("y", -10)
+  .attr("fill", "#000")
+  .attr("text-anchor", "start")
+  .text(response.map(incident => incident.name))
 }
 
 d3.queue()
