@@ -14,6 +14,7 @@ const database = require('knex')(configuration)
 
 const countValues = require('./server-helpers/server-helpers.js').countValues
 const ratio = require('./server-helpers/server-helpers.js').ratio
+const removeNotTrueOrFalse = require('./server-helpers/server-helpers.js').removeNotTrueOrFalse
 
 app.use(cors())
 app.use((req, res, next) => {
@@ -65,7 +66,6 @@ app.get('/data/external/:state', (request, response) => {
     .catch(error => console.log(error))
 })
 
-// get all data
 app.get('/api/v1/all', (request, response) => {
   const year = request.query.year
 
@@ -90,7 +90,6 @@ app.get('/api/v1/all', (request, response) => {
   });
 })
 
-// get a specific incident by id
 app.get('/api/v1/all/:id', (request, response) => {
   const { id } = request.params
 
@@ -107,23 +106,6 @@ app.get('/api/v1/all/:id', (request, response) => {
     })
 })
 
-// get a specific state by its id
-app.get('/api/v1/state-territory/:id', (request, response) => {
-  const { id } = request.params
-  database('states_and_territories').where('id', id)
-    .then((states_and_territories) => {
-      if (states_and_territories.length == 0) {
-        response.status(404).send({error: 'no state for that id'})
-      } else {
-        response.status(200).send(states_and_territories)
-      }
-    })
-    .catch((error) => {
-      response.status(500).send({error: 'somethings wrong with db'})
-    })
-})
-
-// get all incidents for a specific state
 app.get('/api/v1/state-territory/:abbreviation/incidents', (request, response) => {
   const { abbreviation } = request.params
  database('fatal_police_shootings_data').where('state', abbreviation)
@@ -139,13 +121,32 @@ app.get('/api/v1/state-territory/:abbreviation/incidents', (request, response) =
    })
 })
 
-// get the ratio of national instances in which mental illness was a factor
+app.get('/api/v1/state-territory/:abbreviation/incidents/mental-illness', (request, response) => {
+  const { abbreviation } = request.params
+ database('fatal_police_shootings_data').where('state', abbreviation)
+   .then((fatal_police_shootings_data) => {
+     if (fatal_police_shootings_data.length === 0) {
+       response.status(404).send({error: 'no incidents found for the place you entered'})
+     } else {
+       const mIValues = fatal_police_shootings_data.map(incident => incident.signs_of_mental_illness)
+       const denominator = mIValues.length
+       const count = countValues(mIValues)
+       const ratios = ratio(count, denominator)
+       response.status(200).send({ratios: ratios})
+     }
+   })
+   .catch((error) => {
+     response.status(500).send({error: 'somethings wrong with db'})
+   })
+})
+
 app.get('/api/v1/mental-illness', (request, response) => {
   database('fatal_police_shootings_data').select()
     .then((fatal_police_shootings_data) => {
       const mIValues = fatal_police_shootings_data.map(incident => incident.signs_of_mental_illness)
       const denominator = mIValues.length
-      const count = countValues(mIValues)
+      let count = countValues(mIValues)
+      removeNotTrueOrFalse(count)
       const ratios = ratio(count, denominator)
       response.status(200).send({ratios: ratios})
     })
@@ -154,7 +155,6 @@ app.get('/api/v1/mental-illness', (request, response) => {
     })
 })
 
-// get the ratio of national instances in which there is body camera footage
 app.get('/api/v1/body-camera', (request, response) => {
   database('fatal_police_shootings_data').select()
     .then((fatal_police_shootings_data) => {
@@ -169,7 +169,6 @@ app.get('/api/v1/body-camera', (request, response) => {
     })
 })
 
-// get ratios for incidents in which the victim was armed and if so what they were armed with
 app.get('/api/v1/armed', (request, response) => {
   database('fatal_police_shootings_data').select()
     .then((fatal_police_shootings_data) => {
@@ -184,7 +183,6 @@ app.get('/api/v1/armed', (request, response) => {
     })
 })
 
-// get the ratios for incidents by race
 app.get('/api/v1/race', (request, response) => {
   database('fatal_police_shootings_data').select()
     .then((fatal_police_shootings_data) => {
@@ -199,7 +197,6 @@ app.get('/api/v1/race', (request, response) => {
     })
 })
 
-// post a new incident
 app.post('/api/v1/all', (request, response) => {
   if (Object.keys(request.body).length > 14) {
     response.status(422).send({error: 'incorrect format'})

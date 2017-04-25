@@ -1,5 +1,5 @@
 const countValues = exports.countValues = (array) => {
-  return array.reduce((object, value, index) => {
+  return array.reduce((object, value) => {
     if (value === null) {
       value = 'U'
     }
@@ -18,4 +18,14 @@ const ratio = exports.ratio = (object, denominator) => {
       [curr]: object[curr]/denominator
     })
   }, {})
+}
+
+const removeNotTrueOrFalse = exports.removeNotTrueOrFalse = (count) => {
+  if (Object.keys(count).length > 2) {
+    const keyss = Object.keys(count)
+    const props2Delete = Object.keys(count).length - 2
+    keyss.forEach(property => {
+      if (keyss.indexOf(property) > 1) delete count[property]
+    })
+  }
 }
