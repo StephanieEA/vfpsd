@@ -16,6 +16,10 @@ const tooltip = d3.select("body")
 		.append("div")
     .attr("class", "tooltip")
 
+const raceStatChart = d3.select("body")
+    .append("div")
+    .attr("class", "raceStatChart")
+
 const x = d3.scaleLinear()
     .domain([0, 10])
     .rangeRound([600, 900]);
@@ -119,20 +123,17 @@ const clickState = (d) => {
   fetchStateRaceStats(nameToAbbreviation(d.properties.name))
 }
 
-const returnRaceStat = (ratios) => {
-  for(var key in ratios) {
-    return key + ' => ' + ratios[key]
+const returnRaceStat = (object) => {
+  let newn = []
+  for (let prop in object) {
+  newn.push(`${prop} : ${object[prop]}`)
   }
+  return newn
 }
 
 const renderStateStats = (response) => {
-  g.append("text")
-  .attr("class", "chart")
-  .attr("x", 1200)
-  .attr("y", -10)
-  .attr("fill", "#000")
-  .attr("text-anchor", "start")
-  .text(returnRaceStat(response.ratios))
+  console.log(response.ratios)
+  raceStatChart.html(`<div>${returnRaceStat(response.ratios)}</div>`)
 }
 
 d3.queue()
