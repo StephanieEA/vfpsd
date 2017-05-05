@@ -17,7 +17,12 @@ span {
   padding-top: 5px;
 }
 
-svg > circle {
+.usMap {
+  width: 900px;
+  height: 600px;
+}
+
+.usMap > circle {
   opacity: .40;
 }
 
@@ -48,4 +53,13 @@ div.tooltip {
 
 .opaque {
   opacity: .10;
+}
+
+.arc text {
+  font: 10px sans-serif;
+  text-anchor: middle;
+}
+
+.arc path {
+  stroke: #fff;
 }

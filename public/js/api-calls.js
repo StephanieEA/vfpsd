@@ -32,11 +32,11 @@ const assignCityData = (state, incidentCities) => {
     .catch(error => console.log(error))
 }
 
-const fetchStateStats = (state) => {
-  return fetch(`/api/v1/state-territory/${state}/incidents`)
+const fetchStateRaceStats = (state) => {
+  return fetch(`/api/v1/state-territory/${state}/race`)
   .then(response => response.json())
   .then(response => {
-    console.log(response)
+    console.log(response.ratios)
     return response
   })
   .then(response => renderStateStats(response))

@@ -7,7 +7,7 @@ const projection = d3.geoAlbersUsa()
 const path = d3.geoPath()
     .projection(projection);
 
-const svg = d3.select("body")
+const usMap = d3.select("body")
     .append("svg")
     .attr("width", width)
     .attr("height", height);
@@ -24,12 +24,12 @@ const color = d3.scaleThreshold()
     .domain(d3.range(1, 10))
     .range(d3.schemeGreys[9]);
 
-const g = svg.append("g")
+const g = usMap.append("g")
     .attr("class", "key")
     .attr("transform", "translate(-575,575)");
 
 const renderUS = (error, us, stateStats) => {
-  svg.append("g")
+  usMap.append("g")
       .attr("class", "states")
       .selectAll("path")
       .data(topojson.feature(us, us.objects.states).features)
@@ -43,7 +43,7 @@ const renderUS = (error, us, stateStats) => {
       })
       .on("click", clickState)
 
-  svg.insert("path")
+  usMap.insert("path")
       .datum(topojson.mesh(us, us.objects.states, (a, b) => {
         return a !== b; }))
       .attr("class", "state-boundary")
@@ -83,7 +83,7 @@ const renderKey = () => {
 }
 
 const plotCities = (state, response) => {
-  svg.selectAll(`circle.${state}`)
+  usMap.selectAll(`circle.${state}`)
       .data(response)
       .enter()
       .append("circle")
@@ -116,7 +116,13 @@ const clickState = (d) => {
   d3.selectAll('circle, rect, text, line, .caption, .states')
     .attr("class", "opaque")
 
-  fetchStateStats(nameToAbbreviation(d.properties.name))
+  fetchStateRaceStats(nameToAbbreviation(d.properties.name))
+}
+
+const returnRaceStat = (ratios) => {
+  for(var key in ratios) {
+    return key + ' => ' + ratios[key]
+  }
 }
 
 const renderStateStats = (response) => {
@@ -126,7 +132,7 @@ const renderStateStats = (response) => {
   .attr("y", -10)
   .attr("fill", "#000")
   .attr("text-anchor", "start")
-  .text(response.map(incident => incident.name))
+  .text(returnRaceStat(response.ratios))
 }
 
 d3.queue()

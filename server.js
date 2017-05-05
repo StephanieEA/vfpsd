@@ -284,7 +284,6 @@ app.post('/api/v1/all', (request, response) => {
   }
 })
 
-// update information for an incident
 app.patch('/api/v1/all/:id', (request, response) => {
   const updates = request.body
   const { id } = request.params
@@ -304,7 +303,6 @@ app.patch('/api/v1/all/:id', (request, response) => {
     })
 })
 
-// delete an incident
 app.delete('/api/v1/all/:id', (request, response) => {
   const { id } = request.params
   database('fatal_police_shootings_data').where('id', id).del()
