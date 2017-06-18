@@ -56,7 +56,7 @@ app.get('/data/fatal-police-shootings-data.csv', (request, response) => {
 
 app.get('/data/external/:state', (request, response) => {
   const { state } = request.params
-   fetch(`http://api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
+   fetch(`https://api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
     .then(data => {
       return data.json()
     })

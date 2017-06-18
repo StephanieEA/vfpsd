@@ -38,6 +38,8 @@ const fetchStateRaceStats = (state) => {
   .then(response => {
     return response
   })
-  .then(response => renderStateStats(response))
+  .then(response => {
+    console.log([response.ratios])
+    return renderStateStats(response)})
   .catch(error => console.log(error))
 }

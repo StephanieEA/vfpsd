@@ -17,7 +17,7 @@ const tooltip = d3.select("body")
     .attr("class", "tooltip")
 
 const raceStatChart = d3.select("body")
-    .append("div")
+    .append("aside")
     .attr("class", "raceStatChart")
 
 const x = d3.scaleLinear()
@@ -99,7 +99,7 @@ const plotCities = (state, response) => {
         return projection([Object.values(d)[0].longitude, Object.values(d)[0].latitude])[1]
       })
       .attr("r", 3)
-      .attr("fill", "tomato")
+      .attr("fill", "red")
       .on("mouseover", (d) => {
         tooltip.transition()
          .duration(200)
@@ -126,15 +126,45 @@ const clickState = (d) => {
 const returnRaceStat = (object) => {
   let newn = []
   for (let prop in object) {
-  newn.push(`${prop} : ${object[prop]}`)
+  newn.push(Object.assign({}, { [prop] : object[prop]}))
   }
-  return newn
+  console.log(newn)
+  return newn.map(item => JSON.stringify(item))
 }
 
 const renderStateStats = (response) => {
-  console.log(response.ratios)
-  raceStatChart.html(`<div>${returnRaceStat(response.ratios)}</div>`)
+  console.log([response.ratios])
+  raceStatChart.html(
+    `${returnRaceStat(response.ratios)}
+    <svg class="raceStatSVG"></svg>
+    `
+  )
+  pieG.append("path")
+  	.attr("d", raceStatArc)
+  	.style("fill", (d) => { return d})
+    (response.ratios)
 }
+
+const raceStatRadius = Math.min(300/300) / 2;
+const raceStatColor = d3.scaleOrdinal()
+                        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "#2F4F4F"])
+
+const raceStatArc = d3.arc()
+  .outerRadius(raceStatRadius-10)
+  .innerRadius(0);
+
+const raceStatPie = (response) => {
+  d3.pie()
+    .value((d) => {
+      return Object.values(d)})
+    ([response.ratios])
+  }
+
+const pieG = d3.select('raceStatSVG').selectAll("arc")
+	.data(raceStatPie)
+	.enter().append("g")
+	.attr("class", "arc");
+
 
 d3.queue()
   .defer(d3.json, "/data/us.json")
