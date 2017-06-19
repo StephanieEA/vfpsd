@@ -1,9 +1,3 @@
-const stateAbbreviations = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE",
-"FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA",
-"MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND",
-"OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA",
-"WV", "WI", "WY"]
-
 const countCityIncidents = (response) => {
   return response.reduce((object, value) => {
     if (!object[value.city]) {
@@ -18,240 +12,306 @@ const countCityIncidents = (response) => {
 const stateArray = [
     {
         "name": "Alabama",
-        "abbreviation": "AL"
+        "abbreviation": "AL",
+        "fips": 01
     },
     {
         "name": "Alaska",
-        "abbreviation": "AK"
+        "abbreviation": "AK",
+        "fips": 02
     },
-    {
-        "name": "American Samoa",
-        "abbreviation": "AS"
-    },
+    // {
+    //     "name": "American Samoa",
+    //     "abbreviation": "AS",
+    //     "fips": 60
+    // },
     {
         "name": "Arizona",
-        "abbreviation": "AZ"
+        "abbreviation": "AZ",
+        "fips": 04
     },
     {
         "name": "Arkansas",
-        "abbreviation": "AR"
+        "abbreviation": "AR",
+        "fips": 05
     },
     {
         "name": "California",
-        "abbreviation": "CA"
+        "abbreviation": "CA",
+        "fips": 06
     },
     {
         "name": "Colorado",
-        "abbreviation": "CO"
+        "abbreviation": "CO",
+        "fips": 08
     },
     {
         "name": "Connecticut",
-        "abbreviation": "CT"
+        "abbreviation": "CT",
+        "fips": 09
     },
     {
         "name": "Delaware",
-        "abbreviation": "DE"
+        "abbreviation": "DE",
+        "fips": 10
     },
     {
         "name": "District of Columbia",
-        "abbreviation": "DC"
+        "abbreviation": "DC",
+        "fips": 11
     },
-    {
-        "name": "Federated States Of Micronesia",
-        "abbreviation": "FM"
-    },
+    // {
+    //     "name": "Federated States Of Micronesia",
+    //     "abbreviation": "FM",
+    //     "fips": 64
+    // },
     {
         "name": "Florida",
-        "abbreviation": "FL"
+        "abbreviation": "FL",
+        "fips": 12
     },
     {
         "name": "Georgia",
-        "abbreviation": "GA"
+        "abbreviation": "GA",
+        "fips": 13
     },
-    {
-        "name": "Guam",
-        "abbreviation": "GU"
-    },
+    // {
+    //     "name": "Guam",
+    //     "abbreviation": "GU",
+    //     "fips": 66
+    // },
     {
         "name": "Hawaii",
-        "abbreviation": "HI"
+        "abbreviation": "HI",
+        "fips": 15
     },
     {
         "name": "Idaho",
-        "abbreviation": "ID"
+        "abbreviation": "ID",
+        "fips": 16
     },
     {
         "name": "Illinois",
-        "abbreviation": "IL"
+        "abbreviation": "IL",
+        "fips": 17
     },
     {
         "name": "Indiana",
-        "abbreviation": "IN"
+        "abbreviation": "IN",
+        "fips": 18
     },
     {
         "name": "Iowa",
-        "abbreviation": "IA"
+        "abbreviation": "IA",
+        "fips": 19
     },
     {
         "name": "Kansas",
-        "abbreviation": "KS"
+        "abbreviation": "KS",
+        "fips": 20
     },
     {
         "name": "Kentucky",
-        "abbreviation": "KY"
+        "abbreviation": "KY",
+        "fips": 21
     },
     {
         "name": "Louisiana",
-        "abbreviation": "LA"
+        "abbreviation": "LA",
+        "fips": 22
     },
     {
         "name": "Maine",
-        "abbreviation": "ME"
+        "abbreviation": "ME",
+        "fips": 23
     },
-    {
-        "name": "Marshall Islands",
-        "abbreviation": "MH"
-    },
+    // {
+    //     "name": "Marshall Islands",
+    //     "abbreviation": "MH",
+    //     "fips": 68
+    // },
     {
         "name": "Maryland",
-        "abbreviation": "MD"
+        "abbreviation": "MD",
+        "fips": 24
     },
     {
         "name": "Massachusetts",
-        "abbreviation": "MA"
+        "abbreviation": "MA",
+        "fips": 25
     },
     {
         "name": "Michigan",
-        "abbreviation": "MI"
+        "abbreviation": "MI",
+        "fips": 26
     },
     {
         "name": "Minnesota",
-        "abbreviation": "MN"
+        "abbreviation": "MN",
+        "fips": 27
     },
     {
         "name": "Mississippi",
-        "abbreviation": "MS"
+        "abbreviation": "MS",
+        "fips": 28
     },
     {
         "name": "Missouri",
-        "abbreviation": "MO"
+        "abbreviation": "MO",
+        "fips": 29
     },
     {
         "name": "Montana",
-        "abbreviation": "MT"
+        "abbreviation": "MT",
+        "fips": 30
     },
     {
         "name": "Nebraska",
-        "abbreviation": "NE"
+        "abbreviation": "NE",
+        "fips": 31
     },
     {
         "name": "Nevada",
-        "abbreviation": "NV"
+        "abbreviation": "NV",
+        "fips": 32
     },
     {
         "name": "New Hampshire",
-        "abbreviation": "NH"
+        "abbreviation": "NH",
+        "fips": 33
     },
     {
         "name": "New Jersey",
-        "abbreviation": "NJ"
+        "abbreviation": "NJ",
+        "fips": 34
     },
     {
         "name": "New Mexico",
-        "abbreviation": "NM"
+        "abbreviation": "NM",
+        "fips": 35
     },
     {
         "name": "New York",
-        "abbreviation": "NY"
+        "abbreviation": "NY",
+        "fips": 36
     },
     {
         "name": "North Carolina",
-        "abbreviation": "NC"
+        "abbreviation": "NC",
+        "fips": 37
     },
     {
         "name": "North Dakota",
-        "abbreviation": "ND"
+        "abbreviation": "ND",
+        "fips": 38
     },
-    {
-        "name": "Northern Mariana Islands",
-        "abbreviation": "MP"
-    },
+    // {
+    //     "name": "Northern Mariana Islands",
+    //     "abbreviation": "MP",
+    //     "fips": 69
+    // },
     {
         "name": "Ohio",
-        "abbreviation": "OH"
+        "abbreviation": "OH",
+        "fips": 39
     },
     {
         "name": "Oklahoma",
-        "abbreviation": "OK"
+        "abbreviation": "OK",
+        "fips": 40
     },
     {
         "name": "Oregon",
-        "abbreviation": "OR"
+        "abbreviation": "OR",
+        "fips": 41
     },
-    {
-        "name": "Palau",
-        "abbreviation": "PW"
-    },
+    // {
+    //     "name": "Palau",
+    //     "abbreviation": "PW",
+    //     "fips": 70
+    // },
     {
         "name": "Pennsylvania",
-        "abbreviation": "PA"
+        "abbreviation": "PA",
+        "fips": 42
     },
-    {
-        "name": "Puerto Rico",
-        "abbreviation": "PR"
-    },
+    // {
+    //     "name": "Puerto Rico",
+    //     "abbreviation": "PR",
+    //     "fips": 72
+    // },
     {
         "name": "Rhode Island",
-        "abbreviation": "RI"
+        "abbreviation": "RI",
+        "fips": 44
     },
     {
         "name": "South Carolina",
-        "abbreviation": "SC"
+        "abbreviation": "SC",
+        "fips": 45
     },
     {
         "name": "South Dakota",
-        "abbreviation": "SD"
+        "abbreviation": "SD",
+        "fips": 46
     },
     {
         "name": "Tennessee",
-        "abbreviation": "TN"
+        "abbreviation": "TN",
+        "fips": 47
     },
     {
         "name": "Texas",
-        "abbreviation": "TX"
+        "abbreviation": "TX",
+        "fips": 48
     },
     {
         "name": "Utah",
-        "abbreviation": "UT"
+        "abbreviation": "UT",
+        "fips": 49
     },
     {
         "name": "Vermont",
-        "abbreviation": "VT"
+        "abbreviation": "VT",
+        "fips": 50
     },
-    {
-        "name": "Virgin Islands",
-        "abbreviation": "VI"
-    },
+    // {
+    //     "name": "Virgin Islands",
+    //     "abbreviation": "VI",
+    //     "fips": 78
+    // },
     {
         "name": "Virginia",
-        "abbreviation": "VA"
+        "abbreviation": "VA",
+        "fips": 51
     },
     {
         "name": "Washington",
-        "abbreviation": "WA"
+        "abbreviation": "WA",
+        "fips": 53
     },
     {
         "name": "West Virginia",
-        "abbreviation": "WV"
+        "abbreviation": "WV",
+        "fips": 54
     },
     {
         "name": "Wisconsin",
-        "abbreviation": "WI"
+        "abbreviation": "WI",
+        "fips": 55
     },
     {
         "name": "Wyoming",
-        "abbreviation": "WY"
+        "abbreviation": "WY",
+        "fips": 56
     }
 ]
 
 const nameToAbbreviation = (name) => stateArray.find(state => state.name === name).abbreviation
+const abbreviationToFips = (abbreviation) => stateArray.find(state => state.abbreviation === abbreviation).fips
+
+const stateFips =
+  stateArray.map(state => state.fips)
+
+const stateAbbreviations =
+  stateArray.map(state => state.abbreviation)

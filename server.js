@@ -14,6 +14,9 @@ const database = require('knex')(configuration)
 
 const countValues = require('./server-helpers/server-helpers.js').countValues
 const ratio = require('./server-helpers/server-helpers.js').ratio
+const abbreviationToFips = require('./server-helpers/server-helpers.js').abbreviationToFips
+
+const externalApiKey = 'cfd09d84d97fbf5e069878fb6dd031cd1897663f'
 
 app.use(cors())
 app.use((req, res, next) => {
@@ -55,11 +58,14 @@ app.get('/data/fatal-police-shootings-data.csv', (request, response) => {
 
 app.get('/data/external/:state', (request, response) => {
   const { state } = request.params
-   fetch(`http://api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
+  //  fetch(`http://api.sba.gov/geodata/city_links_for_state_of/${state}.json`)
+    fetch(`http://api.census.gov/data/2016/pep/population?get=GEONAME&for=place:*&in=state:${abbreviationToFips(state)}&key=${externalApiKey}`)
     .then(data => {
       return data.json()
     })
     .then(data => {
+      console.log(data)
+      console.log(state)
       response.send(data);
     })
     .catch(error => console.log(error))
